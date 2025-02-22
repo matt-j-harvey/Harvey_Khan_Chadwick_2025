@@ -6,10 +6,50 @@ from datetime import datetime
 from sklearn.metrics import r2_score
 
 # Custom Modules
+import MVAR_Utils_2P
 import Ridge_Model_Class
 
 
 
+
+
+
+
+def get_best_ridge_penalties(output_directory, context):
+
+    # Get Selection Of Potential Ridge Penalties
+    penalty_possible_values = np.load(os.path.join(output_directory, context + "_penalty_possible_values.npy"))
+
+    # Load Visual Penalty Matrix
+    penalty_matrix = np.load(os.path.join(output_directory, context + "_Ridge_Penalty_Search_Results.npy"))
+    best_score = np.max(penalty_matrix)
+    score_indexes = np.where(penalty_matrix == best_score)
+
+    stimuli_penalty_index = score_indexes[0]
+    behaviour_penalty_index = score_indexes[1]
+    interaction_penalty_index = score_indexes[2]
+
+    stimuli_penalty_value = penalty_possible_values[stimuli_penalty_index][0]
+    behaviour_penalty_value = penalty_possible_values[behaviour_penalty_index][0]
+    interaction_penalty_value = penalty_possible_values[interaction_penalty_index][0]
+
+    return stimuli_penalty_value, behaviour_penalty_value, interaction_penalty_value
+
+
+def create_ridge_penalty_dictionary(save_directory_root, context):
+
+    stimuli_penalty, behaviour_penalty, interaction_penalty = get_best_ridge_penalties(save_directory_root, context)
+    print("stimuli_penalty", stimuli_penalty)
+    print("behaviour_penalty", behaviour_penalty)
+    print("interaction_penalty", interaction_penalty)
+
+    ridge_penalty_dict = {
+        "stimuli_penalty": stimuli_penalty,
+        "behaviour_penalty": behaviour_penalty,
+        "interaction_penalty": interaction_penalty,
+    }
+
+    np.save(os.path.join(save_directory_root, context + "_ridge_penalty_dict.npy"), ridge_penalty_dict)
 
 
 
@@ -101,26 +141,17 @@ def n_fold_cv(n_trials_list, trial_length, design_matrix, delta_f_matrix, model,
 
 
 
-def load_regression_matrix(session, mvar_output_directory, context):
-
-    regression_matrix = np.load(os.path.join(mvar_output_directory,session, "Design_Matricies", context + "_Design_Matrix_Dictionary.npy"), allow_pickle=True)[()]
-
-    DesignMatrix = regression_matrix["DesignMatrix"]
-    dFtot = regression_matrix["dFtot"]
-    Nvar = regression_matrix["Nvar"]
-    Nbehav = regression_matrix["Nbehav"]
-    Nt = regression_matrix["Nt"]
-    Nstim = regression_matrix["N_stim"]
-    Ntrials = regression_matrix["N_trials"]
-    timewindow = regression_matrix["timewindow"]
-
-    return DesignMatrix, dFtot, Nvar, Nbehav, Nt, Nstim, Ntrials, timewindow
-
 
 def get_cv_ridge_penalties(session, mvar_output_directory, context):
 
+    # Create Save Directory
+    save_directory = os.path.join(mvar_output_directory, session, "Ridge_Penalty_Search")
+    if not os.path.exists(save_directory):
+        os.makedirs(save_directory)
+
     # Load Data
-    design_matrix, delta_f_matrix, Nvar, Nbehav, Nt, Nstim, Ntrials, timewindow = load_regression_matrix(session, mvar_output_directory, context)
+    design_matrix, delta_f_matrix, Nvar, Nbehav, Nt, Nstim, Ntrials, timewindow = MVAR_Utils_2P.load_regression_matrix(session, mvar_output_directory, context)
+
     print("Nvar", Nvar)
     print("Nbehav", Nbehav)
     print("Nt", Nt)
@@ -132,13 +163,8 @@ def get_cv_ridge_penalties(session, mvar_output_directory, context):
     penalty_stop = 5
     number_of_penalties = (penalty_stop - penalty_start) + 1
     penalty_possible_values = np.logspace(start=penalty_start, stop=penalty_stop, base=10, num=number_of_penalties)
+    np.save(os.path.join(save_directory, context + "_penalty_possible_values.npy"), penalty_possible_values)
     print("Penalty Possible Values", penalty_possible_values)
-
-    # Create Save Directory
-    save_directory = os.path.join(mvar_output_directory, session, "Ridge_Penalty_Search")
-    if not os.path.exists(save_directory):
-        os.makedirs(save_directory)
-
 
     # Create Empty Matrix To Hold Errors
     error_matrix = np.zeros((number_of_penalties, number_of_penalties, number_of_penalties))
@@ -174,8 +200,10 @@ def get_cv_ridge_penalties(session, mvar_output_directory, context):
 
                 # Draw Matrix
                 plot_error_matrix(save_directory, context, error_matrix, number_of_penalties, penalty_possible_values)
-
                 print("Stimuli Penalty: ", stimuli_penalty, "Behaviour Penalty", behaviour_penalty, "Interaction", interaction_penalty, "Score", mean_error, "at ", datetime.now())
 
     # Save This Matrix
     np.save(os.path.join(save_directory, context + "_Ridge_Penalty_Search_Results.npy"), error_matrix)
+
+    # Create
+    create_ridge_penalty_dictionary(save_directory, context)

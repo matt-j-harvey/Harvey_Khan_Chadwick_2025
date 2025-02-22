@@ -18,6 +18,10 @@ import Downsample_AI_Matrix_Framewise_2P
 import Create_Behaviour_Matrix
 import Create_Regression_Matricies
 import MVAR_Ridge_Penalty_CV
+import Fit_Full_Model_N_Folds
+import Partition_MVAR_Contributions
+import Visualise_Partitoned_Contributions
+
 
 """
 import Create_Behaviour_Tensors
@@ -28,51 +32,9 @@ import Partition_MVAR_Contributions
 """
 
 
-def get_best_ridge_penalties(output_directory):
-    # Get Selection Of Potential Ridge Penalties
-    penalty_possible_values = np.load(os.path.join(output_directory, "Ridge_Penalty_Search", "Penalty_Possible_Values.npy"))
-
-    # Load Visual Penalty Matrix
-    penalty_matrix = np.load(os.path.join(output_directory, "Ridge_Penalty_Search", "Local_NMF_Ridge_Penalty_Search_Results.npy"))
-    best_score = np.max(penalty_matrix)
-    score_indexes = np.where(penalty_matrix == best_score)
-
-    stimuli_penalty_index = score_indexes[0]
-    behaviour_penalty_index = score_indexes[1]
-    interaction_penalty_index = score_indexes[2]
-
-    stimuli_penalty_value = penalty_possible_values[stimuli_penalty_index][0]
-    behaviour_penalty_value = penalty_possible_values[behaviour_penalty_index][0]
-    interaction_penalty_value = penalty_possible_values[interaction_penalty_index][0]
-
-    return stimuli_penalty_value, behaviour_penalty_value, interaction_penalty_value
 
 
-def create_ridge_penalty_dictionary(save_directory_root):
-    stimuli_penalty, behaviour_penalty, interaction_penalty = get_best_ridge_penalties(save_directory_root)
-    print("stimuli_penalty", stimuli_penalty)
-    print("behaviour_penalty", behaviour_penalty)
-    print("interaction_penalty", interaction_penalty)
-
-    ridge_penalty_dict = {
-        "stimuli_penalty": stimuli_penalty,
-        "behaviour_penalty": behaviour_penalty,
-        "interaction_penalty": interaction_penalty,
-    }
-
-    """
-
-    ridge_penalty_dict = {
-        "stimuli_penalty":10,
-        "behaviour_penalty":100,
-        "interaction_penalty":1000,
-    }
-    """
-    return ridge_penalty_dict
-
-
-
-def mvar_pipeline(data_root_directory, session_list, mvar_output_directory, start_window, stop_window):
+def mvar_pipeline(data_root_directory, session_list, mvar_output_directory, start_window, stop_window, frame_rate):
 
     """
     //// Running The MVAR Pipeline ////
@@ -86,16 +48,16 @@ def mvar_pipeline(data_root_directory, session_list, mvar_output_directory, star
 
 
     # General Preprocessing
-
+    """
+    
     for session in tqdm(session_list, position=0, desc="Session:"):
 
-        """
         # Downsample AI Matrix
         Downsample_AI_Matrix_Framewise_2P.downsample_ai_matrix(data_root_directory, session, mvar_output_directory)
       
         # Create Behaviour Matrix
         Create_Behaviour_Matrix.create_behaviour_matrix(data_root_directory, session, mvar_output_directory)
-
+   
         # Create Activity Tensors
         MVAR_Utils_2P.create_activity_tensor(data_root_directory, session, mvar_output_directory, "visual_context_stable_vis_1_onsets.npy", start_window, stop_window)
         MVAR_Utils_2P.create_activity_tensor(data_root_directory, session, mvar_output_directory, "visual_context_stable_vis_2_onsets.npy", start_window, stop_window)
@@ -107,38 +69,28 @@ def mvar_pipeline(data_root_directory, session_list, mvar_output_directory, star
         MVAR_Utils_2P.create_behaviour_tensor(data_root_directory, session, mvar_output_directory, "visual_context_stable_vis_2_onsets.npy", start_window, stop_window)
         MVAR_Utils_2P.create_behaviour_tensor(data_root_directory, session, mvar_output_directory, "odour_context_stable_vis_1_onsets.npy", start_window, stop_window)
         MVAR_Utils_2P.create_behaviour_tensor(data_root_directory, session, mvar_output_directory, "odour_context_stable_vis_2_onsets.npy", start_window, stop_window)
-        """
+
         # Create Regression Matricies
-        Create_Regression_Matricies.create_regression_matricies(session, mvar_output_directory, "visual", start_window, stop_window)
-        Create_Regression_Matricies.create_regression_matricies(session, mvar_output_directory, "odour", start_window, stop_window)
+        Create_Regression_Matricies.create_regression_matricies(data_root_directory, session, mvar_output_directory, "visual", start_window, stop_window)
+        Create_Regression_Matricies.create_regression_matricies(data_root_directory, session, mvar_output_directory, "odour", start_window, stop_window)
 
         # Perform CV For Each Context
-        MVAR_Ridge_Penalty_CV.get_cv_ridge_penalties(session, mvar_output_directory, "visual")
-        MVAR_Ridge_Penalty_CV.get_cv_ridge_penalties(session, mvar_output_directory, "odour")
+        #MVAR_Ridge_Penalty_CV.get_cv_ridge_penalties(session, mvar_output_directory, "visual")
+        #MVAR_Ridge_Penalty_CV.get_cv_ridge_penalties(session, mvar_output_directory, "odour")
 
+        # Fit Models
+        #Fit_Full_Model_N_Folds.fit_full_model(mvar_output_directory, session, "visual")
+        #Fit_Full_Model_N_Folds.fit_full_model(mvar_output_directory, session, "odour")
+
+        # Partition Contributions
+        #Partition_MVAR_Contributions.partition_model(mvar_output_directory, session, "visual")
+        #Partition_MVAR_Contributions.partition_model(mvar_output_directory, session, "odour")
+    
     """
-    # Fit Combined Model
-
-
-    # Get Ridge Penalty Dict
-    ridge_penalty_dict = create_ridge_penalty_dictionary(mvar_directory_root)
-
-    # Fit Model
-    Fit_Full_Model_LocaNMF_N_Folds.fit_full_model(mvar_directory_root, session_list, ridge_penalty_dict)
-
-    for mouse in tqdm(session_list, position=0, desc="Mouse"):
-        for session in tqdm(mouse, position=1, desc="Session"):
-            # Partition Model Contributions
-            Partition_MVAR_Contributions.parition_mouse_model(mvar_directory_root, session)
 
     # View Partitioned Contribution
-    # Visualise_Partitioned_Contributions.visualise_model(data_directory_root, session, mvar_directory_root)
-
-    # Get ROI Seed MAps
-    Get_ROI_Seed_Maps.get_all_roi_seed_maps(mvar_directory_root, session_list)
-    """
-
-
+    #Visualise_Partitioned_Contributions.visualise_model(data_directory_root, session, mvar_directory_root)
+    Visualise_Partitoned_Contributions.visualise_component_contribution(data_root_directory, session_list, mvar_output_directory, start_window, stop_window, frame_rate, "stim")
 
 
 # File Directory Info
@@ -156,10 +108,10 @@ control_session_list = [
 
 
 # Model Info
-start_window = -69
-stop_window = 56
-frame_period = 36
+start_window = -17
+stop_window = 12
+frame_rate = 6.37
 
 # Control Switching
-mvar_pipeline(data_root, control_session_list, mvar_output_root, start_window, stop_window)
+mvar_pipeline(data_root, control_session_list, mvar_output_root, start_window, stop_window, frame_rate)
 

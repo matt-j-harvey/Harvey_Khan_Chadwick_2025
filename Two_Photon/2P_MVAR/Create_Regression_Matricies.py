@@ -16,7 +16,7 @@ def open_tensor(file_location):
     return activity_tensor
 
 
-def load_data(mvar_directory_root, session, context, start_window, stop_window):
+def load_data(data_directory_root, session, mvar_directory_root, context, start_window, stop_window):
 
     # Load Activity Tensors
     vis_1_activity_tensor = open_tensor(os.path.join(mvar_directory_root, session, "Activity_Tensors", context + "_context_stable_vis_1"))
@@ -38,12 +38,18 @@ def load_data(mvar_directory_root, session, context, start_window, stop_window):
     vis_2_behaviour_tensor = np.swapaxes(vis_2_behaviour_tensor, 0, 1)
 
     # Get Time Data
-    trial_start_point = np.abs(start_window)
-    timestep = 36
     window = 1500
+    frame_rate = np.load(os.path.join(data_directory_root, session, "Frame_Rate.npy"))
+    timestep = (float(1)/frame_rate)*1000
+    trial_start_point = np.abs(start_window)
     start = trial_start_point - int(window / timestep)
     stop = trial_start_point + int(window / timestep)
     timewindow = np.array(list(range(start, stop)))
+
+    print("frame_rate", frame_rate)
+    print("timestep", timestep)
+    print("start", start)
+    print("stop", stop)
 
     # Combine Stimuli
     delta_f_list = [vis_1_activity_tensor, vis_2_activity_tensor]
@@ -64,10 +70,10 @@ def load_data(mvar_directory_root, session, context, start_window, stop_window):
 
 
 
-def create_regression_matricies(session, mvar_directory_root, context, start_window, stop_window):
+def create_regression_matricies(data_directory_root, session, mvar_directory_root, context, start_window, stop_window):
 
     # Load Data
-    Nvar, Nbehav, Nt, Nstim, Ntrials, delta_f_list, behaviour_list, timewindow = load_data(mvar_directory_root, session, context, start_window, stop_window)
+    Nvar, Nbehav, Nt, Nstim, Ntrials, delta_f_list, behaviour_list, timewindow = load_data(data_directory_root, session, mvar_directory_root, context, start_window, stop_window)
     print("Nvar", Nvar)
     print("Nbehav", Nbehav)
     print("Nt", Nt)
