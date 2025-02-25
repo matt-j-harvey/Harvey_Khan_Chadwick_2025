@@ -57,32 +57,32 @@ def create_delta_f_matrix(tensor_directory, session, onset_file_list):
 
 
 
-def run_full_model_pipeline(data_directory_root, session, glm_output_diretory_root):
-
-    context_list = ["visual", "odour"]
+def run_full_model_pipeline(data_directory, session, glm_output_directory, context_list = ["visual", "odour"]):
 
     # Create Behaviour Matrix
-    Create_Behaviour_Matrix.create_behaviour_matrix(data_root_directory, session, mvar_output_directory)
+    Create_Behaviour_Matrix.create_behaviour_matrix(data_directory, session, glm_output_directory)
 
     # Create Activity Tensors
-    GLM_Utils.create_activity_tensor(data_root_directory, session, mvar_output_directory, "visual_context_stable_vis_1_onsets.npy", start_window, stop_window)
-    GLM_Utils.create_activity_tensor(data_root_directory, session, mvar_output_directory, "visual_context_stable_vis_2_onsets.npy", start_window, stop_window)
-    GLM_Utils.create_activity_tensor(data_root_directory, session, mvar_output_directory, "odour_context_stable_vis_1_onsets.npy", start_window, stop_window)
-    GLM_Utils.create_activity_tensor(data_root_directory, session, mvar_output_directory, "odour_context_stable_vis_2_onsets.npy", start_window, stop_window)
+    GLM_Utils.create_activity_tensor(data_directory, session, glm_output_directory, "visual_context_stable_vis_1_onsets.npy", start_window, stop_window)
+    GLM_Utils.create_activity_tensor(data_directory, session, glm_output_directory, "visual_context_stable_vis_2_onsets.npy", start_window, stop_window)
+    GLM_Utils.create_activity_tensor(data_directory, session, glm_output_directory, "odour_context_stable_vis_1_onsets.npy", start_window, stop_window)
+    GLM_Utils.create_activity_tensor(data_directory, session, glm_output_directory, "odour_context_stable_vis_2_onsets.npy", start_window, stop_window)
 
     # Create Behaviour Tensors
-    GLM_Utils.create_behaviour_tensor(data_root_directory, session, mvar_output_directory, "visual_context_stable_vis_1_onsets.npy", start_window, stop_window)
-    GLM_Utils.create_behaviour_tensor(data_root_directory, session, mvar_output_directory, "visual_context_stable_vis_2_onsets.npy", start_window, stop_window)
-    GLM_Utils.create_behaviour_tensor(data_root_directory, session, mvar_output_directory, "odour_context_stable_vis_1_onsets.npy", start_window, stop_window)
-    GLM_Utils.create_behaviour_tensor(data_root_directory, session, mvar_output_directory, "odour_context_stable_vis_2_onsets.npy", start_window, stop_window)
+    GLM_Utils.create_behaviour_tensor(data_directory, session, glm_output_directory, "visual_context_stable_vis_1_onsets.npy", start_window, stop_window)
+    GLM_Utils.create_behaviour_tensor(data_directory, session, glm_output_directory, "visual_context_stable_vis_2_onsets.npy", start_window, stop_window)
+    GLM_Utils.create_behaviour_tensor(data_directory, session, glm_output_directory, "odour_context_stable_vis_1_onsets.npy", start_window, stop_window)
+    GLM_Utils.create_behaviour_tensor(data_directory, session, glm_output_directory, "odour_context_stable_vis_2_onsets.npy", start_window, stop_window)
 
-    # Create Regression Matricies
+    # Iterate through each context
     for context in context_list:
 
+        # Create Regression Matricies
         design_matrix, delta_f_matrix = Create_Regression_Matricies.create_regression_matricies(session, mvar_directory_root, context)
 
         # Run Regression
-        Ridge_Regression_Model_General.fit_ridge_model(delta_f_matrix, design_matrix, os.path.join(tensor_save_directory, base_directory))
+        save_directory = os.path.join(glm_output_directory, session, context)
+        Ridge_Regression_Model_General.fit_ridge_model(delta_f_matrix, design_matrix, save_directory)
 
     """
     # Visualise Results

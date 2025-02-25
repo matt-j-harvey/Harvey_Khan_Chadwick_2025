@@ -20,7 +20,7 @@ import Create_Regression_Matricies
 import MVAR_Ridge_Penalty_CV
 import Fit_Full_Model_N_Folds
 import Partition_MVAR_Contributions
-import Visualise_Partitoned_Contributions
+import Visualise_Partitioned_Contributions
 
 
 """
@@ -48,10 +48,11 @@ def mvar_pipeline(data_root_directory, session_list, mvar_output_directory, star
 
 
     # General Preprocessing
-    """
+
     
     for session in tqdm(session_list, position=0, desc="Session:"):
 
+        """
         # Downsample AI Matrix
         Downsample_AI_Matrix_Framewise_2P.downsample_ai_matrix(data_root_directory, session, mvar_output_directory)
       
@@ -69,6 +70,7 @@ def mvar_pipeline(data_root_directory, session_list, mvar_output_directory, star
         MVAR_Utils_2P.create_behaviour_tensor(data_root_directory, session, mvar_output_directory, "visual_context_stable_vis_2_onsets.npy", start_window, stop_window)
         MVAR_Utils_2P.create_behaviour_tensor(data_root_directory, session, mvar_output_directory, "odour_context_stable_vis_1_onsets.npy", start_window, stop_window)
         MVAR_Utils_2P.create_behaviour_tensor(data_root_directory, session, mvar_output_directory, "odour_context_stable_vis_2_onsets.npy", start_window, stop_window)
+  
 
         # Create Regression Matricies
         Create_Regression_Matricies.create_regression_matricies(data_root_directory, session, mvar_output_directory, "visual", start_window, stop_window)
@@ -77,20 +79,25 @@ def mvar_pipeline(data_root_directory, session_list, mvar_output_directory, star
         # Perform CV For Each Context
         #MVAR_Ridge_Penalty_CV.get_cv_ridge_penalties(session, mvar_output_directory, "visual")
         #MVAR_Ridge_Penalty_CV.get_cv_ridge_penalties(session, mvar_output_directory, "odour")
-
+     
         # Fit Models
-        #Fit_Full_Model_N_Folds.fit_full_model(mvar_output_directory, session, "visual")
-        #Fit_Full_Model_N_Folds.fit_full_model(mvar_output_directory, session, "odour")
+        Fit_Full_Model_N_Folds.fit_full_model(mvar_output_directory, session, "visual")
+        Fit_Full_Model_N_Folds.fit_full_model(mvar_output_directory, session, "odour")
 
         # Partition Contributions
-        #Partition_MVAR_Contributions.partition_model(mvar_output_directory, session, "visual")
-        #Partition_MVAR_Contributions.partition_model(mvar_output_directory, session, "odour")
-    
-    """
+        Partition_MVAR_Contributions.partition_model(mvar_output_directory, session, "visual")
+        Partition_MVAR_Contributions.partition_model(mvar_output_directory, session, "odour")
+        """
 
     # View Partitioned Contribution
-    #Visualise_Partitioned_Contributions.visualise_model(data_directory_root, session, mvar_directory_root)
-    Visualise_Partitoned_Contributions.visualise_component_contribution(data_root_directory, session_list, mvar_output_directory, start_window, stop_window, frame_rate, "stim")
+
+    #Visualise_Partitioned_Contributions.visualise_component_contribution(data_root_directory, session_list, mvar_output_directory, start_window, stop_window, frame_rate, "stim")
+    #Visualise_Partitioned_Contributions.visualise_component_contribution(data_root_directory, session_list, mvar_output_directory, start_window, stop_window, frame_rate, "recurrent")
+    #Visualise_Partitioned_Contributions.visualise_component_contribution(data_root_directory, session_list, mvar_output_directory, start_window, stop_window, frame_rate, "diagonal")
+    #Visualise_Partitioned_Contributions.visualise_component_contribution(data_root_directory, session_list, mvar_output_directory, start_window, stop_window, frame_rate, "behaviour")
+
+
+    Visualise_Partitioned_Contributions.check_alignment(data_root_directory, session_list, mvar_output_directory, start_window, stop_window, frame_rate)
 
 
 # File Directory Info

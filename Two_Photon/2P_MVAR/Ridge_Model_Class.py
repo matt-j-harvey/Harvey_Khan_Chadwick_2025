@@ -28,6 +28,7 @@ class ridge_model():
         self.MVAR_parameters = None
 
         # Create Regularisation Matrix (Tikhonov matrix)
+
         self.Tikhonov = np.zeros([Nvar + Nstim * Nt + Nbehav, Nvar + Nstim * Nt + Nbehav])
         self.Tikhonov[0:Nvar, 0:Nvar] = np.sqrt(interaction_ridge_penalty) * np.eye(Nvar)
         self.Tikhonov[Nvar:(Nvar + Nstim * Nt), Nvar:(Nvar + Nstim * Nt)] = np.sqrt(stimulus_ridge_penalty) * np.eye(Nstim * Nt)

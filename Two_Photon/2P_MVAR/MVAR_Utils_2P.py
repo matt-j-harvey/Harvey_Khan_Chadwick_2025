@@ -288,4 +288,5 @@ def load_regression_matrix(session, mvar_output_directory, context):
     Ntrials = regression_matrix["N_trials"]
     timewindow = regression_matrix["timewindow"]
 
+
     return DesignMatrix, dFtot, Nvar, Nbehav, Nt, Nstim, Ntrials, timewindow

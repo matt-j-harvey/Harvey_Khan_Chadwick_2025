@@ -46,10 +46,14 @@ def load_data(data_directory_root, session, mvar_directory_root, context, start_
     stop = trial_start_point + int(window / timestep)
     timewindow = np.array(list(range(start, stop)))
 
+    print("Start Window", start_window)
+    print("Stop Window", stop_window)
+    print("Window", window)
     print("frame_rate", frame_rate)
     print("timestep", timestep)
     print("start", start)
     print("stop", stop)
+    print("Timewindow", timewindow)
 
     # Combine Stimuli
     delta_f_list = [vis_1_activity_tensor, vis_2_activity_tensor]
@@ -106,7 +110,7 @@ def create_regression_matricies(data_directory_root, session, mvar_directory_roo
 
 
     # Combine Regressors Into Design Matrix
-    DesignMatrix = np.concatenate((stimblocks.T, dFtot_negshift.T, behaviourtot.T), axis=1)  # design matrix
+    DesignMatrix = np.concatenate((dFtot_negshift.T, stimblocks.T, behaviourtot.T), axis=1)  # design matrix
 
     # Combine Into Dictionary
     regression_matrix_dictionary = {
