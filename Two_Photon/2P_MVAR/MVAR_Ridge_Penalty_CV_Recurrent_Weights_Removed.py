@@ -152,7 +152,7 @@ def get_cv_ridge_penalties(session, mvar_output_directory, context):
     # Load Data
     design_matrix, delta_f_matrix, Nvar, Nbehav, Nt, Nstim, Ntrials, timewindow = MVAR_Utils_2P.load_regression_matrix(session, mvar_output_directory, context)
 
-    
+    -
 
     print("Nvar", Nvar)
     print("Nbehav", Nbehav)
