@@ -5,7 +5,7 @@ import tables
 from tqdm import tqdm
 import matplotlib.pyplot as plt
 
-import MVAR_Utils_2P
+import MVAR_Preprocessing_Utils
 
 
 def forceAspect(ax,aspect=1):
@@ -153,7 +153,7 @@ def create_behaviour_matrix(data_root_directory, base_directory, mvar_output_dir
     downsampled_ai_matrix = np.load(downsampled_ai_file)
 
     # Create Stimuli Dictionary
-    stimuli_dictionary = MVAR_Utils_2P.load_rig_1_channel_dict()
+    stimuli_dictionary = MVAR_Preprocessing_Utils.load_rig_1_channel_dict()
 
     # Extract Lick and Running Traces
     lick_trace = downsampled_ai_matrix[stimuli_dictionary["Lick"]]
