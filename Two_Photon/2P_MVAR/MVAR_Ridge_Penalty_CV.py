@@ -4,6 +4,7 @@ import numpy as np
 from tqdm import tqdm
 from datetime import datetime
 from sklearn.metrics import r2_score
+from sklearn.model_selection import KFold
 
 # Custom Modules
 import MVAR_Utils_2P
@@ -93,26 +94,24 @@ def plot_error_matrix(save_directory, context, error_matrix, number_of_penalties
 
 
 
-def n_fold_cv(n_trials_list, trial_length, design_matrix, delta_f_matrix, model, n_folds=5):
+def n_fold_cv(design_matrix, delta_f_matrix, model, n_folds=5):
 
-    n_trials = np.sum(n_trials_list)
-    trials_per_fold = int(n_trials / n_folds)
-    fold_size = trials_per_fold * trial_length
-
-
+    # Transpose DF Matrix
     delta_f_matrix = np.transpose(delta_f_matrix)
-    n_pixels = np.shape(delta_f_matrix)[1]
 
+    # Create K Fold Object
+    k_fold_object = KFold(n_splits=n_folds, shuffle=True)
+
+    # Test and Train each Fold
     error_list = []
-    for fold_index in range(n_folds):
-        fold_start = fold_index * fold_size
-        fold_stop = fold_start + fold_size
+    for i, (train_index, test_index) in enumerate(k_fold_object.split(design_matrix)):
 
-        x_test = design_matrix[fold_start:fold_stop]
-        y_test = delta_f_matrix[fold_start:fold_stop]
+        # Split Data Into Train and Test
+        x_train = design_matrix[train_index]
+        y_train = delta_f_matrix[train_index]
 
-        x_train = np.delete(design_matrix, list(range(fold_start, fold_stop)), axis=0)
-        y_train = np.delete(delta_f_matrix, list(range(fold_start, fold_stop)), axis=0)
+        x_test = design_matrix[test_index]
+        y_test = delta_f_matrix[test_index]
 
         # Fit Model
         model.fit(x_train, y_train)
@@ -131,8 +130,6 @@ def n_fold_cv(n_trials_list, trial_length, design_matrix, delta_f_matrix, model,
         plt.imshow(weight_matrix, vmin=-weight_magnitude, vmax=weight_magnitude, cmap="bwr")
         plt.show()
         """
-
-        print("Score", score)
 
     # Get Mean Error Across All Folds
     mean_error = np.mean(error_list)
@@ -170,9 +167,9 @@ def get_cv_ridge_penalties(session, mvar_output_directory, context):
     error_matrix = np.zeros((number_of_penalties, number_of_penalties, number_of_penalties))
 
     # Iterate Through Each Penalty
-    for stimuli_penalty_index in range(number_of_penalties):
+    for stimuli_penalty_index in tqdm(range(number_of_penalties)):
         for behaviour_penalty_index in range(number_of_penalties):
-            for interaction_penalty_index in tqdm(range(number_of_penalties)):
+            for interaction_penalty_index in (range(number_of_penalties)):
 
                 # Select Penalties
                 stimuli_penalty = penalty_possible_values[stimuli_penalty_index]
@@ -180,27 +177,26 @@ def get_cv_ridge_penalties(session, mvar_output_directory, context):
                 interaction_penalty = penalty_possible_values[interaction_penalty_index]
 
                 # Create Model
+                """
                 print("pre class",)
                 print("Nvar",Nvar)
                 print("Nstim",Nstim)
                 print("Nt",Nt)
                 print("Nbehav",Nbehav)
                 print("Ntrials",Ntrials)
+                """
 
                 model = Ridge_Model_Class.ridge_model(Nvar, Nstim, Nt, Nbehav, Ntrials, interaction_penalty, stimuli_penalty, behaviour_penalty)
 
                 # Perform 5 Fold Cross Validation
-                mean_error = n_fold_cv(Ntrials, Nt, design_matrix, delta_f_matrix, model)
+                mean_error = n_fold_cv(design_matrix, delta_f_matrix, model)
 
                 # Add This To The Error Matrix
                 error_matrix[stimuli_penalty_index, behaviour_penalty_index, interaction_penalty_index] = mean_error
 
-                # Save The Weights
-                model_name = "Stimuli_Penalty_" + str(stimuli_penalty_index).zfill(3) + "Interaction_Penalty_" + str(interaction_penalty_index).zfill(3) + "_Behaviour_Penalty_" + str(behaviour_penalty_index).zfill(3)
-
-                # Draw Matrix
-                plot_error_matrix(save_directory, context, error_matrix, number_of_penalties, penalty_possible_values)
-                print("Stimuli Penalty: ", stimuli_penalty, "Behaviour Penalty", behaviour_penalty, "Interaction", interaction_penalty, "Score", mean_error, "at ", datetime.now())
+        # Draw Matrix
+        plot_error_matrix(save_directory, context, error_matrix, number_of_penalties, penalty_possible_values)
+        print("Stimuli Penalty: ", stimuli_penalty, "Behaviour Penalty", behaviour_penalty, "Interaction", interaction_penalty, "Score", mean_error, "at ", datetime.now())
 
     # Save This Matrix
     np.save(os.path.join(save_directory, context + "_Ridge_Penalty_Search_Results.npy"), error_matrix)
