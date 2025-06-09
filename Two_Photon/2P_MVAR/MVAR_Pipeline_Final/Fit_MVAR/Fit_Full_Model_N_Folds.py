@@ -7,9 +7,8 @@ from scipy import stats
 from sklearn.model_selection import KFold
 
 # Custom Modules
-import MVAR_Utils_2P
+import MVAR_Utils
 import Ridge_Model_Class
-import Create_Regression_Matricies
 
 
 def n_fold_fit(model, design_matrix, delta_f_matrix):
@@ -76,7 +75,7 @@ def fit_full_model(mvar_directory_root, session, context):
     #interaction_penalty = 1000000
 
     # Load Data
-    design_matrix, delta_f_matrix, Nvar, Nbehav, Nt, Nstim, Ntrials, timewindow = MVAR_Utils_2P.load_regression_matrix(session, mvar_directory_root, context)
+    design_matrix, delta_f_matrix, Nvar, Nbehav, Nt, Nstim, Ntrials, timewindow = MVAR_Utils.load_regression_matrix(session, mvar_directory_root, context)
     print("design_matrix", np.shape(design_matrix))
     print("delta_f_matrix", np.shape(delta_f_matrix))
 
