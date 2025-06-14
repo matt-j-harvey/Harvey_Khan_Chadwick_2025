@@ -49,8 +49,8 @@ def sanity_check_model_performance(design_matrix, mvar_parameters, delta_f_matri
     axis_1.imshow(np.transpose(prediction))
     axis_2.imshow(np.transpose(delta_f_matrix))
 
-    MVAR_Utils_2P.forceAspect(axis_1)
-    MVAR_Utils_2P.forceAspect(axis_2)
+    MVAR_Utils.forceAspect(axis_1)
+    MVAR_Utils.forceAspect(axis_2)
 
     plt.show()
 

@@ -150,8 +150,12 @@ def create_behaviour_tensor(data_root_directory, session, mvar_output_directory,
         pickle.dump(trial_tensor_dictionary, handle, protocol=4)
 
 
+def forceAspect(ax,aspect=1):
+    im = ax.get_images()
+    extent =  im[0].get_extent()
+    ax.set_aspect(abs((extent[1]-extent[0])/(extent[3]-extent[2]))/aspect)
 
-
+"""
 def load_df_matrix(base_directory, z_score=True, smooth=True, window_size=3):
 
     # Load DF Matrix
@@ -168,4 +172,31 @@ def load_df_matrix(base_directory, z_score=True, smooth=True, window_size=3):
         df_matrix = moving_average_df(df_matrix, window_size)
 
     return df_matrix
+
+"""
+
+
+def load_df_matrix():
+
+    """
+    Baseline fluorescence F0(t) was computed by:
+     smoothing F(t) (causal moving average of 0.375s)
+     determining for each time point the minimum value in the preceding 600s time window (120s for slice experiments).
+
+     frame_rate 6.37
+    Smoothing Window size = 3
+    Moving baseline size = 3822
+
+
+    """
+
+
+frame_rate = np.load(r"C:\Users\matth\OneDrive - The Francis Crick Institute\Documents\Neurexin_Paper\ALM 2P\Data\Controls\65.2a\2024_08_05_Switching\Frame_Rate.npy")
+print("frame_rate", frame_rate)
+
+df_matrix = np.load(r"C:\Users\matth\OneDrive - The Francis Crick Institute\Documents\Neurexin_Paper\ALM 2P\Data\Controls\65.2a\2024_08_05_Switching\df_matrix.npy")
+
+plt.imshow(df_matrix, vmin=0.2, vmax=2)
+forceAspect(plt.gca())
+plt.show()
 
