@@ -70,26 +70,10 @@ def fit_full_model(mvar_directory_root, session, context):
     behaviour_penalty = ridge_penalty_dict["behaviour_penalty"]
     interaction_penalty = ridge_penalty_dict["interaction_penalty"]
 
-    #stimuli_penalty = 1
-    #behaviour_penalty = 1000000
-    #interaction_penalty = 1000000
-
     # Load Data
     design_matrix, delta_f_matrix, Nvar, Nbehav, Nt, Nstim, Ntrials, timewindow = MVAR_Utils.load_regression_matrix(session, mvar_directory_root, context)
     print("design_matrix", np.shape(design_matrix))
     print("delta_f_matrix", np.shape(delta_f_matrix))
-
-    """
-    plt.title("Design Matrix")
-    plt.imshow(np.transpose(design_matrix))
-    MVAR_Utils_2P.forceAspect(plt.gca(), aspect=1)
-    plt.show()
-
-    plt.title("delta_f_matrix")
-    plt.imshow(delta_f_matrix)
-    MVAR_Utils_2P.forceAspect(plt.gca(), aspect=1)
-    plt.show()
-    """
 
     print("Timewindow", len(timewindow))
     delta_f_matrix = np.transpose(delta_f_matrix)
