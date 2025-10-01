@@ -579,8 +579,12 @@ def plot_group_partitioned_lick_cd_projections(output_root, session_list, model_
                                               alpha=0.1)
 
         # Add To Combined projection To Later Get Y lims
-        combined_projection_list.append(stimulus_only_mean)
-        combined_projection_list.append(stimulus_recurrent_sem)
+        combined_projection_list.append(np.add(stimulus_only_mean, stimulus_only_sem))
+        combined_projection_list.append(np.add(stimulus_recurrent_mean, stimulus_recurrent_sem))
+        combined_projection_list.append(np.subtract(stimulus_only_mean, stimulus_only_sem))
+        combined_projection_list.append(np.subtract(stimulus_recurrent_mean, stimulus_recurrent_sem))
+
+
 
     # Get YLim
     combined_data = np.concatenate(combined_projection_list)

@@ -140,7 +140,7 @@ def create_behaviour_matrix(data_root_directory, base_directory, mvar_output_dir
     """
     Design Matrix Structure
 
-    Lagged Binarised Lick Trace Upto 1000 prior to 1000 following
+    Lagged Binarised Lick Trace Upto 1000ms following lick
 
     Running Trace
 

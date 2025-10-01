@@ -1,4 +1,82 @@
+import os
+
 import numpy as np
+
+
+
+def get_lick_tensors(data_directory, output_directory, start_window, stop_window):
+
+    # Create Save Directory
+    save_directory = os.path.join(output_directory, "Activity_Tensors")
+    if not os.path.exists(save_directory):
+        os.mkdir(save_directory)
+
+    # Load Df Matrix
+    df_matrix = np.load(os.path.join(data_directory, "df_over_f_matrix.npy"))
+    print("df matrix", np.shape(df_matrix))
+
+    # Load Frame Rate
+    frame_rate = np.load(os.path.join(data_directory, "Frame_Rate.npy"))
+    start_window_frames = int(start_window * frame_rate)
+    stop_window_frames = int(stop_window * frame_rate)
+    print("start_window_frames", start_window_frames)
+    print("stop_window_frames", stop_window_frames)
+
+    # Load Onsets
+    vis_context_lick_onsets = np.load(os.path.join(output_directory, "Lick_Onsets", "Visual_Context_Lick_Onsets.npy"))
+    odour_context_lick_onsets = np.load(os.path.join(output_directory, "Lick_Onsets", "Odour_Context_Lick_Onsets.npy"))
+    combined_lick_onsets = np.concatenate([vis_context_lick_onsets, odour_context_lick_onsets])
+
+    # Get Data Tensors
+    visual_lick_tensor   = get_data_tensor(df_matrix, vis_context_lick_onsets, start_window=start_window_frames, stop_window=stop_window_frames, baseline_correction =True)
+    odour_lick_tensor    = get_data_tensor(df_matrix, odour_context_lick_onsets, start_window=start_window_frames, stop_window=stop_window_frames, baseline_correction =True)
+    combined_lick_tensor = get_data_tensor(df_matrix, combined_lick_onsets, start_window=start_window_frames, stop_window=stop_window_frames, baseline_correction =True)
+
+    # Save These
+    np.save(os.path.join(save_directory, "visual_lick_tensor.npy"), visual_lick_tensor)
+    np.save(os.path.join(save_directory, "odour_lick_tensor.npy"), odour_lick_tensor)
+    np.save(os.path.join(save_directory, "combined_lick_tensor.npy"), combined_lick_tensor)
+
+
+
+def get_choice_tensors(data_directory, output_directory, start_window, stop_window):
+
+    # Create Save Directory
+    save_directory = os.path.join(output_directory, "Activity_Tensors")
+    if not os.path.exists(save_directory):
+        os.mkdir(save_directory)
+
+    # Load Df Matrix
+    df_matrix = np.load(os.path.join(data_directory, "df_over_f_matrix.npy"))
+    print("df matrix", np.shape(df_matrix))
+
+    # Load Frame Rate
+    frame_rate = np.load(os.path.join(data_directory, "Frame_Rate.npy"))
+    start_window_frames = int(start_window * frame_rate)
+    stop_window_frames = int(stop_window * frame_rate)
+    print("start_window_frames", start_window_frames)
+    print("stop_window_frames", stop_window_frames)
+
+    # Load Onsets
+    vis_context_stable_vis_1_onsets = np.load(os.path.join(data_directory, "Stimuli_Onsets", "visual_context_stable_vis_1_onsets.npy"))
+    vis_context_stable_vis_2_onsets = np.load(os.path.join(data_directory, "Stimuli_Onsets", "visual_context_stable_vis_2_onsets.npy"))
+    odour_1_onsets = np.load(os.path.join(data_directory, "Stimuli_Onsets", "Odour_1_onset_frames.npy"))
+    odour_2_onsets = np.load(os.path.join(data_directory, "Stimuli_Onsets", "Odour_2_onset_frames.npy"))
+
+    # Get Data Tensors
+    vis_context_stable_vis_1_tensor = get_data_tensor(df_matrix, vis_context_stable_vis_1_onsets, start_window=start_window_frames, stop_window=stop_window_frames, baseline_correction=True)
+    vis_context_stable_vis_2_tensor = get_data_tensor(df_matrix, vis_context_stable_vis_2_onsets, start_window=start_window_frames, stop_window=stop_window_frames, baseline_correction=True)
+    odour_1_tensor = get_data_tensor(df_matrix, odour_1_onsets, start_window=start_window_frames, stop_window=stop_window_frames, baseline_correction=True)
+    odour_2_tensor = get_data_tensor(df_matrix, odour_2_onsets, start_window=start_window_frames, stop_window=stop_window_frames, baseline_correction=True)
+
+    # Save These
+    np.save(os.path.join(save_directory, "vis_context_stable_vis_1_tensor.npy"), vis_context_stable_vis_1_tensor)
+    np.save(os.path.join(save_directory, "vis_context_stable_vis_2_tensor.npy"), vis_context_stable_vis_2_tensor)
+    np.save(os.path.join(save_directory, "odour_1_tensor.npy"), odour_1_tensor)
+    np.save(os.path.join(save_directory, "odour_2_tensor.npy"), odour_2_tensor)
+
+
+
 
 
 def get_data_tensor(df_matrix, onset_list, start_window, stop_window, baseline_correction=True, baseline_start=0, baseline_stop=5):

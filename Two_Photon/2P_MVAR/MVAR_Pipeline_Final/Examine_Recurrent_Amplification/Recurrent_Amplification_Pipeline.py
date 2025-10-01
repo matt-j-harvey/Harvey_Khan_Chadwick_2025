@@ -8,8 +8,10 @@ import Get_Recurrent_Weights
 import Get_Stimuli_Recurrent_Interactions
 import Plot_Stimuli_Weight_Interactions
 
+
 def recurrent_amplification_pipeline(data_root_directory, mvar_directory, session_list):
 
+    """
     # Plot Individual Sessions
     for session in session_list:
 
@@ -26,23 +28,26 @@ def recurrent_amplification_pipeline(data_root_directory, mvar_directory, sessio
         # Get Recurrent Weights and Variants
         Get_Recurrent_Weights.get_recurrent_weights(model_dict, output_directory)
 
-        # Get Interactions - Diagonal, Recurrent, Recurrent Shuffled
+        # Get Interactions - Diagonal and Recurrent
         Get_Stimuli_Recurrent_Interactions.get_stimuli_recurrent_interactions(data_root_directory, session, output_directory, "recurrent_weights")
         Get_Stimuli_Recurrent_Interactions.get_stimuli_recurrent_interactions(data_root_directory, session, output_directory, "diagonal_weights")
-        Get_Stimuli_Recurrent_Interactions.get_stimuli_recurrent_interactions(data_root_directory, session, output_directory, "shuffled_recurrent_weights")
 
         # Plot Recurrent interactions
         Plot_Stimuli_Weight_Interactions.plot_session_interactions(output_directory)
 
-
     # Plot Group Results
     Plot_Stimuli_Weight_Interactions.plot_group_interactions(mvar_directory, session_list)
     Plot_Stimuli_Weight_Interactions.plot_scatters(mvar_directory, session_list)
+    """
+
+    #Plot_Stimuli_Weight_Interactions.plot_total_interactions(mvar_directory, session_list)
+    Plot_Stimuli_Weight_Interactions.compare_modulation_interaction(mvar_directory, session_list)
 
 
 # File Directory Info
 data_root = r"C:\Users\matth\OneDrive - The Francis Crick Institute\Documents\Neurexin_Paper\ALM 2P\Data\Controls"
-mvar_output_root = r"C:\Users\matth\OneDrive - The Francis Crick Institute\Documents\Neurexin_Paper\ALM 2P\2P_MVAR_Results_Final_No_Z"
+mvar_output_root = r"C:\Users\matth\OneDrive - The Francis Crick Institute\Documents\Neurexin_Paper\ALM 2P\Full_Pipeline_Results"
+#mvar_output_root = r"C:\Users\matth\OneDrive - The Francis Crick Institute\Documents\Neurexin_Paper\ALM 2P\Full_Pipeline_Results_Positive_Only"
 
 control_session_list = [
     r"65.2a\2024_08_05_Switching",

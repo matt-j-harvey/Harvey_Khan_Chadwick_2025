@@ -66,7 +66,7 @@ def visualise_downsampling(original_trace, downsampled_trace):
 
 def downsample_ai_matrix(data_root_directory, base_directory, mvar_output_directory):
 
-    # Load Frame Times
+    # Load Times of each 2photon Z-Stack
     frame_times = np.load(os.path.join(data_root_directory, base_directory, "Behaviour", "Stack_Onsets.npy"), allow_pickle=True)[()]
 
     # Load AI Recorder File
@@ -81,7 +81,6 @@ def downsample_ai_matrix(data_root_directory, base_directory, mvar_output_direct
     downsampled_ai_matrix = []
     for trace_index in range(number_of_traces):
         full_trace = ai_data[:, trace_index]
-
         downsampled_trace = downsammple_trace_framewise(full_trace, frame_times)
 
         """
@@ -99,7 +98,7 @@ def downsample_ai_matrix(data_root_directory, base_directory, mvar_output_direct
 
 
     downsampled_ai_matrix = np.array(downsampled_ai_matrix)
-    print("DOwnsampled AI Matrix Shape", np.shape(downsampled_ai_matrix))
+    print("Downsampled AI Matrix Shape", np.shape(downsampled_ai_matrix))
 
     # Save Downsampled AI Matrix
     save_directory = os.path.join(mvar_output_directory, base_directory, "Behaviour")

@@ -71,7 +71,7 @@ def visualise_mvar_results_session(data_root_directory, mvar_directory, session_
         # Load Frame Rate
         frame_rate = np.load(os.path.join(data_root_directory, session, "Frame_Rate.npy"))
         x_values = Visualise_Results_Utils.get_time_x_values(timewindow, frame_rate)
-
+        """
         # Load Model Dictionary
         model_dict = np.load(os.path.join(mvar_directory, session, "Full_Model", model_type + "_Model_Dict.npy"), allow_pickle=True)[()]
         print("model dict", model_dict.keys())
@@ -81,7 +81,6 @@ def visualise_mvar_results_session(data_root_directory, mvar_directory, session_
         if not os.path.exists(save_directory):
             os.makedirs(save_directory)
 
-        """
         # Extract Model Predictions
         Extract_Model_Predictions.extract_model_predictions(data_root_directory, session, design_matrix, delta_f_matrix, Nvar, Nt, Nstim, Ntrials, model_dict, stimulus_list, save_directory)
 
@@ -99,7 +98,6 @@ def visualise_mvar_results_session(data_root_directory, mvar_directory, session_
 
         # Plot Stim Weights
         MVAR_Output_Plotting_Functions.plot_stim_weights(model_dict, frame_rate, save_directory)
-        """
 
         # Partition Contributions
         Partition_Contributions.partition_model_contributions(data_root_directory, session, design_matrix, Nvar, Nt, Nstim, Ntrials, model_dict, save_directory)
@@ -107,14 +105,16 @@ def visualise_mvar_results_session(data_root_directory, mvar_directory, session_
         # Plot Partitioned Contribution
         MVAR_Output_Plotting_Functions.plot_partitioned_contributions(save_directory, stimulus_list, frame_rate)
         MVAR_Output_Plotting_Functions.plot_partitioned_lick_cds(save_directory, stimulus_list, frame_rate)
+    """
 
     # Plot Group Results
     MVAR_Output_Plotting_Functions.plot_group_lick_cd_projections(mvar_directory, session_list, model_type, stimulus_list[0:4], x_values)
-    MVAR_Output_Plotting_Functions. plot_group_partitioned_lick_cd_projections(mvar_directory, session_list, model_type, stimulus_list[0:4], x_values)
+    MVAR_Output_Plotting_Functions.plot_group_partitioned_lick_cd_projections(mvar_directory, session_list, model_type, stimulus_list[0:4], x_values)
+
 
 # File Directory Info
 data_root = r"C:\Users\matth\OneDrive - The Francis Crick Institute\Documents\Neurexin_Paper\ALM 2P\Data\Controls"
-mvar_output_root = r"C:\Users\matth\OneDrive - The Francis Crick Institute\Documents\Neurexin_Paper\ALM 2P\2P_MVAR_Results_Final_No_Z"
+mvar_output_root = r"C:\Users\matth\OneDrive - The Francis Crick Institute\Documents\Neurexin_Paper\ALM 2P\Full_Pipeline_Results"
 
 control_session_list = [
     r"65.2a\2024_08_05_Switching",

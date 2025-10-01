@@ -162,6 +162,12 @@ def create_regression_matrix(data_directory_root, session, mvar_directory_root, 
         dFtot_negshift = split_negshift_into_seperate_contexts(Ntrials, Nt, Nvar, dFtot_negshift)
         DesignMatrix = np.concatenate((dFtot_negshift.T, stimblocks.T, behaviourtot.T), axis=1)  # design matrix
 
+    """
+    elif model_type == "Seperate_Timesteps":
+        dFtot_negshift = split_negshift_into_seperate_contexts(Ntrials, Nt, Nvar, dFtot_negshift)
+        DesignMatrix = np.concatenate((dFtot_negshift.T, stimblocks.T, behaviourtot.T), axis=1)  # design matrix
+    """
+
     # Combine Into Dictionary
     regression_matrix_dictionary = {
         "DesignMatrix": DesignMatrix,

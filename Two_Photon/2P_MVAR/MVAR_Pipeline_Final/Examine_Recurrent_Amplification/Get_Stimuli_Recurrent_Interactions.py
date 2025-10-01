@@ -1,6 +1,7 @@
 import os
 import numpy as np
 import matplotlib.pyplot as plt
+from tqdm import tqdm
 
 
 def get_integrated_interaction(stimulus_vector, recurrent_weights, duration=9):
@@ -13,9 +14,7 @@ def get_integrated_interaction(stimulus_vector, recurrent_weights, duration=9):
         current_state = np.add(current_state, stimulus_vector)
 
     trial_vector = np.array(trial_vector)
-
     return trial_vector
-
 
 
 def get_stimuli_recurrent_interactions(data_directory, session, output_directory, weight_matrix_file):
@@ -56,3 +55,5 @@ def get_stimuli_recurrent_interactions(data_directory, session, output_directory
 
     # Save List
     np.save(os.path.join(save_directory, weight_matrix_file + "_Interaction.npy"), interaction_list)
+
+

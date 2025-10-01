@@ -13,8 +13,11 @@ import Create_Behaviour_Tensor
 def preprocess_session(data_root_directory, session, mvar_output_directory, start_window, stop_window):
 
     """
-    For Each Session Creates A Design Matrix Dict
-    This is used to Fit the MVAR
+    For each session this pipeline will create:
+    A behaviour matrix - matrix of shape (n_timepoints, n_behavioural_regressors)
+    Tensors of neural activity for each trial type
+    Tensors of behavioural data for each trial type
+    These tensors are then used to fit the MVAR model
     """
 
     # Downsample AI Matrix
@@ -43,10 +46,14 @@ def preprocess_session(data_root_directory, session, mvar_output_directory, star
     Create_Behaviour_Tensor.create_behaviour_tensor(data_root_directory, session, mvar_output_directory, "Odour_2_onset_frames.npy", start_window, stop_window)
 
 
-# File Directory Info
-data_root = r"C:\Users\matth\OneDrive - The Francis Crick Institute\Documents\Neurexin_Paper\ALM 2P\Data\Controls"
-mvar_output_root = r"C:\Users\matth\OneDrive - The Francis Crick Institute\Documents\Neurexin_Paper\ALM 2P\2P_MVAR_Results_Final_No_Z"
 
+# Output directory where you want the data to be saved to
+mvar_output_root = r"C:\Users\matth\OneDrive - The Francis Crick Institute\Documents\Neurexin_Paper\ALM 2P\Full_Pipeline_Results_Check"
+
+# Directory which contains raw data
+data_root  = r"C:\Users\matth\OneDrive - The Francis Crick Institute\Documents\Neurexin_Paper\ALM 2P\Data\Controls"
+
+# List of Sessions to Process
 control_session_list = [
     r"65.2a\2024_08_05_Switching",
     r"65.2b\2024_07_31_Switching",
@@ -57,8 +64,8 @@ control_session_list = [
 ]
 
 # Model Info
-start_window = -17
-stop_window = 12
+start_window = -17 # How many timepoints before the onset of each stimulus to include
+stop_window = 12 # How many timepoints after the onset of each stimulus to include
 
 # Control Switching
 for session in tqdm(control_session_list, desc="Session"):

@@ -23,7 +23,7 @@ def load_design_matrix(session, mvar_output_directory, model_type):
 
 
 
-def n_fold_cv(design_matrix, delta_f_matrix, model, n_folds=5):
+def n_fold_cv(design_matrix, delta_f_matrix, model, n_folds=5, return_parameters=True):
 
     # Transpose DF Matrix
     delta_f_matrix = np.transpose(delta_f_matrix)
@@ -55,11 +55,16 @@ def n_fold_cv(design_matrix, delta_f_matrix, model, n_folds=5):
         error_list.append(score)
 
         # Save Parameters
-        model_parameters = model.MVAR_parameters
-        weights_list.append(model_parameters)
+        if return_parameters == True:
+            model_parameters = model.MVAR_parameters
+            weights_list.append(model_parameters)
 
     # Get Mean Error Across All Folds
     mean_error = np.mean(error_list)
-    mean_weights = np.mean(np.array(weights_list), axis=0)
+
+    if return_parameters == True:
+        mean_weights = np.mean(np.array(weights_list), axis=0)
+    else:
+        mean_weights = None
 
     return mean_error, mean_weights

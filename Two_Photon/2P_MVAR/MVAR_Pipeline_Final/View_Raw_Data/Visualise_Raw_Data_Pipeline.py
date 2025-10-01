@@ -2,6 +2,7 @@ import numpy as np
 import os
 from tqdm import tqdm
 
+import Get_Delta_F
 import View_Lick_Tuning
 import Visualise_Raster
 import Visualise_PSTHs
@@ -11,6 +12,9 @@ import View_Lick_CD_Projections
 def visualise_raw_data(data_root, session_list, mvar_output_root):
 
     for session in tqdm(session_list):
+
+        # Get Delta F Matrix
+        Get_Delta_F.get_delta_f(os.path.join(data_root, session))
 
         # View Lick Tuning and get Lick CD
         View_Lick_Tuning.view_lick_tuning(data_root, session, mvar_output_root)
@@ -37,7 +41,8 @@ def visualise_raw_data(data_root, session_list, mvar_output_root):
 
 # File Directory Info
 data_root = r"C:\Users\matth\OneDrive - The Francis Crick Institute\Documents\Neurexin_Paper\ALM 2P\Data\Controls"
-mvar_output_root = r"C:\Users\matth\OneDrive - The Francis Crick Institute\Documents\Neurexin_Paper\ALM 2P\2P_MVAR_Results_Final_No_Z"
+mvar_output_root = r"C:\Users\matth\OneDrive - The Francis Crick Institute\Documents\Neurexin_Paper\ALM 2P\Full_Pipeline_Results"
+mvar_output_root = r"C:\Users\matth\OneDrive - The Francis Crick Institute\Documents\Neurexin_Paper\ALM 2P\Full_Pipeline_Results_moving_baseline"
 
 control_session_list = [
     r"65.2a\2024_08_05_Switching",
