@@ -10,7 +10,7 @@ import Get_Data_Tensor
 def get_lick_cd_projection(data_root, session, mvar_output_root, onset_file, start_window, stop_window):
 
     # Load dF/F
-    df_matrix = np.load(os.path.join(data_root, session, "df_over_f_matrix.npy"))
+    df_matrix = np.load(os.path.join(mvar_output_root, session, "df_over_f_matrix.npy"))
 
     # Load Onsets
     onset_list = np.load(os.path.join(data_root, session, "Stimuli_Onsets", onset_file + "_onsets.npy"))
@@ -22,7 +22,7 @@ def get_lick_cd_projection(data_root, session, mvar_output_root, onset_file, sta
     mean_response = np.mean(data_tensor, axis=0)
 
     # Load Lick CD
-    lick_cd = np.load(os.path.join(mvar_output_root, session, "Raw Data Visualisation", "Lick_Tuning", "Lick_Coding_Dimension.npy"))
+    lick_cd = np.load(os.path.join(mvar_output_root, session, "Lick_Tuning", "Lick_Coding_Dimension.npy"))
 
     # Create Save Directory
     save_directory = os.path.join(mvar_output_root, session, "Raw Data Visualisation", "Lick_CD_Projections")

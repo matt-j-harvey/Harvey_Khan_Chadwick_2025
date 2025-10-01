@@ -7,7 +7,7 @@ import Plotting_Functions
 def visualise_raster(data_root, session, mvar_output_root):
 
     # Load dF/F
-    df_matrix = np.load(os.path.join(data_root, session, "df_over_f_matrix.npy"))
+    df_matrix = np.load(os.path.join(mvar_output_root, session, "df_over_f_matrix.npy"))
     n_timepoints, n_neurons = np.shape(df_matrix)
 
     # Load Frame Rate
@@ -20,7 +20,7 @@ def visualise_raster(data_root, session, mvar_output_root):
     vmax = np.percentile(df_matrix, q=99)
 
     # Plot PSTH Sorted by Lick Coding Dimension
-    lick_cd = np.load(os.path.join(mvar_output_root, session, "Raw Data Visualisation", "Lick_Tuning", "Lick_Coding_Dimension.npy"))
+    lick_cd = np.load(os.path.join(mvar_output_root, session, "Lick_Tuning", "Lick_Coding_Dimension.npy"))
     lick_cd_indicies = lick_cd.argsort()
     lick_cd_indicies = np.flip(lick_cd_indicies)
 
@@ -41,6 +41,10 @@ def visualise_raster(data_root, session, mvar_output_root):
     Plotting_Functions.forceAspect(axis_1, aspect=3)
 
     # Save Figure
-    plt.savefig(os.path.join(mvar_output_root, session, "Raw Data Visualisation", "Raster.png"))
+    save_directory = os.path.join(mvar_output_root, session, "Raw Data Visualisation")
+    if not os.path.exists(save_directory):
+        os.makedirs(save_directory)
+
+    plt.savefig(os.path.join(save_directory, "Raster.png"))
     #plt.show()
     plt.close()

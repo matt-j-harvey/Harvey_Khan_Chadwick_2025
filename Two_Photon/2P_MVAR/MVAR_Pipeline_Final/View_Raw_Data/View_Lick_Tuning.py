@@ -35,7 +35,7 @@ def view_lick_tuning(data_root, session, mvar_output_root):
     print("df matrix", np.shape(df_matrix))
 
     # Load Lick Onsets
-    lick_onsets = np.load(os.path.join(data_root, session, "Stimuli_Onsets", "Lick_Onset_Frames.npy"))
+    lick_onsets = np.load(os.path.join(mvar_output_root, session, "Behaviour", "Lick_Onset_Frames.npy"))
     print("lick onsets", len(lick_onsets))
 
     # Load Frame Rate
@@ -55,7 +55,7 @@ def view_lick_tuning(data_root, session, mvar_output_root):
                                                      baseline_start=0,
                                                      baseline_stop=5)
 
-    save_directory = os.path.join(mvar_output_root, session, "Raw Data Visualisation", "Lick_Tuning")
+    save_directory = os.path.join(mvar_output_root, session, "Lick_Tuning")
     if not os.path.exists(save_directory):
         os.makedirs(save_directory)
 
@@ -76,7 +76,6 @@ def view_lick_tuning(data_root, session, mvar_output_root):
     # Get Lick Coding Dimension
     lick_cd_window_start = int(abs(start_window) - frame_rate)
     lick_cd_window_stop = abs(start_window)
-
 
     # Get Lick Preceeding Tensor
     lick_preceeding_tensor = lick_df_tensor[:, lick_cd_window_start:lick_cd_window_stop]
