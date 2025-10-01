@@ -27,12 +27,12 @@ def fit_mvar_models_pipeline(data_root, session, mvar_output_root,  start_window
 
 
 
-# File Directory Info
-data_root = r"C:\Users\matth\OneDrive - The Francis Crick Institute\Documents\Neurexin_Paper\ALM 2P\Data\Controls"
-#mvar_output_root = r"C:\Users\matth\OneDrive - The Francis Crick Institute\Documents\Neurexin_Paper\ALM 2P\2P_MVAR_Results_Final_No_Z"
-mvar_output_root = r"C:\Users\matth\OneDrive - The Francis Crick Institute\Documents\Neurexin_Paper\ALM 2P\Full_Pipeline_Results_MW1"
-mvar_output_root = r"C:\Users\matth\OneDrive - The Francis Crick Institute\Documents\Neurexin_Paper\ALM 2P\Full_Pipeline_Results"
 
+# Output directory where you want the data to be saved to
+mvar_output_root = r"C:\Users\matth\Documents\PhD Docs\ALM 2P\Results\MVAR"
+
+# Directory which contains raw data
+data_root = r"C:\Users\matth\Documents\PhD Docs\ALM 2P\Data\Controls"
 
 control_session_list = [
     r"65.2a\2024_08_05_Switching",
@@ -49,10 +49,7 @@ stop_window = 12
 
 for session in control_session_list:
 
-    # Control Switching
     fit_mvar_models_pipeline(data_root, session, mvar_output_root, start_window, stop_window, model_type="No_Recurrent")
     fit_mvar_models_pipeline(data_root, session, mvar_output_root, start_window, stop_window, model_type="Standard")
     fit_mvar_models_pipeline(data_root, session, mvar_output_root, start_window, stop_window, model_type="Seperate_Contexts")
-
-    # Get Null Comparison
 
