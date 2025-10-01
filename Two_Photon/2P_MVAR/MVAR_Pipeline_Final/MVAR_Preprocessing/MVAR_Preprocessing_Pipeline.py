@@ -3,6 +3,7 @@ import numpy as np
 from tqdm import tqdm
 import sys
 
+import Get_Delta_F
 import Downsample_AI_Matrix_Framewise_2P
 import Extract_Onsets
 import Create_Activity_Tensor
@@ -14,17 +15,22 @@ def preprocess_session(data_root_directory, session, mvar_output_directory, star
 
     """
     For each session this pipeline will create:
+    A delta_f_over_f_matrix - matrix of shape (n_timepoints, n_neurons)
     A behaviour matrix - matrix of shape (n_timepoints, n_behavioural_regressors)
     Tensors of neural activity for each trial type
     Tensors of behavioural data for each trial type
+    A list of odour onsets and lick onsets
     These tensors are then used to fit the MVAR model
     """
 
+    # Create Delta F Matrix
+    Get_Delta_F.get_delta_f(data_root_directory, session, mvar_output_root)
+
     # Downsample AI Matrix
-    Downsample_AI_Matrix_Framewise_2P.downsample_ai_matrix(data_root_directory, session, mvar_output_directory)
+    Downsample_AI_Matrix_Framewise_2P.downsample_ai_matrix(data_root_directory, session, mvar_output_root)
 
     # Extract Onsets
-    Extract_Onsets.extract_odour_onsets(os.path.join(data_root_directory, session))
+    Extract_Onsets.extract_lick_onsets(data_root_directory, session, mvar_output_root)
 
     # Create Behaviour Matrix
     Create_Behaviour_Matrix.create_behaviour_matrix(data_root_directory, session, mvar_output_directory)
@@ -48,10 +54,10 @@ def preprocess_session(data_root_directory, session, mvar_output_directory, star
 
 
 # Output directory where you want the data to be saved to
-mvar_output_root = r"C:\Users\matth\OneDrive - The Francis Crick Institute\Documents\Neurexin_Paper\ALM 2P\Full_Pipeline_Results_Check"
+mvar_output_root = r"C:\Users\matth\Documents\PhD Docs\ALM 2P\Results\MVAR"
 
 # Directory which contains raw data
-data_root  = r"C:\Users\matth\OneDrive - The Francis Crick Institute\Documents\Neurexin_Paper\ALM 2P\Data\Controls"
+data_root = r"C:\Users\matth\Documents\PhD Docs\ALM 2P\Data\Controls"
 
 # List of Sessions to Process
 control_session_list = [

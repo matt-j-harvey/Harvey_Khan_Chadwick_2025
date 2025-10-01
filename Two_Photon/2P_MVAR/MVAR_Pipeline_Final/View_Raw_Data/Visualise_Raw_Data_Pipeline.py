@@ -14,11 +14,12 @@ def visualise_raw_data(data_root, session_list, mvar_output_root):
     for session in tqdm(session_list):
 
         # Get Delta F Matrix
-        Get_Delta_F.get_delta_f(os.path.join(data_root, session))
+        Get_Delta_F.get_delta_f(data_root, session, mvar_output_root)
 
         # View Lick Tuning and get Lick CD
         View_Lick_Tuning.view_lick_tuning(data_root, session, mvar_output_root)
 
+        """
         # View Full Raster
         Visualise_Raster.visualise_raster(data_root, session, mvar_output_root)
 
@@ -37,12 +38,11 @@ def visualise_raw_data(data_root, session_list, mvar_output_root):
 
     # View Group Results
     View_Lick_CD_Projections.view_group_lick_cd(data_root, session_list, mvar_output_root, -15, 12)
-
+    """
 
 # File Directory Info
 data_root = r"C:\Users\matth\OneDrive - The Francis Crick Institute\Documents\Neurexin_Paper\ALM 2P\Data\Controls"
-mvar_output_root = r"C:\Users\matth\OneDrive - The Francis Crick Institute\Documents\Neurexin_Paper\ALM 2P\Full_Pipeline_Results"
-mvar_output_root = r"C:\Users\matth\OneDrive - The Francis Crick Institute\Documents\Neurexin_Paper\ALM 2P\Full_Pipeline_Results_moving_baseline"
+mvar_output_root = r"C:\Users\matth\OneDrive - The Francis Crick Institute\Documents\Neurexin_Paper\ALM 2P\Full_Pipeline_Results_Check"
 
 control_session_list = [
     r"65.2a\2024_08_05_Switching",

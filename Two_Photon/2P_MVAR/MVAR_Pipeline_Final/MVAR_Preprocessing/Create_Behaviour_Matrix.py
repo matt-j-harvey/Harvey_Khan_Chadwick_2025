@@ -14,61 +14,20 @@ def forceAspect(ax,aspect=1):
     ax.set_aspect(abs((extent[1]-extent[0])/(extent[3]-extent[2]))/aspect)
 
 
-
-def get_step_onsets(trace, threshold=1, window=10):
-    state = 0
-    number_of_timepoints = len(trace)
-    onset_times = []
-    time_below_threshold = 0
-
-    onset_line = []
-
-    for timepoint in range(number_of_timepoints):
-        if state == 0:
-            if trace[timepoint] > threshold:
-                state = 1
-                onset_times.append(timepoint)
-                time_below_threshold = 0
-            else:
-                pass
-        elif state == 1:
-            if trace[timepoint] > threshold:
-                time_below_threshold = 0
-            else:
-                time_below_threshold += 1
-                if time_below_threshold > window:
-                    state = 0
-                    time_below_threshold = 0
-        onset_line.append(state)
-
-    return onset_times
-
-
-def create_lagged_matrix(lick_trace, lick_threshold, n_lags):
-
-    # Get Lick Onsets
-    lick_onsets  = get_step_onsets(lick_trace, lick_threshold)
+def create_lagged_matrix(lick_onsets, n_timepoints, n_lags):
 
     # Create Empty Regressor
-    n_timepoints = len(lick_trace)
-    lagged_regressor = np.zeros((n_timepoints, (n_lags*2)+1))
+    lagged_regressor = np.zeros((n_timepoints, n_lags+1))
+    print("lagged regressor", np.shape(lagged_regressor))
 
     # Populate With Lags
     for onset in lick_onsets:
-
-        # Add Preceeding Regressor
-        """
-        for lag_index in range(n_lags):
-            timepoint = onset - (n_lags - lag_index)
-            if timepoint >= 0:
-                lagged_regressor[timepoint, lag_index] = 1
-        """
 
         # Add Following Regressor
         for lag_index in range(n_lags+1):
             timepoint = onset + lag_index
             if timepoint <= n_timepoints:
-                lagged_regressor[timepoint, n_lags + lag_index] = 1
+                lagged_regressor[timepoint, lag_index] = 1
 
     """
     # Visualise
@@ -151,12 +110,12 @@ def create_behaviour_matrix(data_root_directory, base_directory, mvar_output_dir
     # Load Downsampled AI
     downsampled_ai_file = os.path.join(mvar_output_directory, base_directory, "Behaviour", "Downsampled_AI_Matrix_Framewise.npy")
     downsampled_ai_matrix = np.load(downsampled_ai_file)
+    n_timepoints = np.shape(downsampled_ai_matrix)[1]
 
     # Create Stimuli Dictionary
     stimuli_dictionary = MVAR_Preprocessing_Utils.load_rig_1_channel_dict()
 
-    # Extract Lick and Running Traces
-    lick_trace = downsampled_ai_matrix[stimuli_dictionary["Lick"]]
+    # Extract Running Trace
     running_trace = downsampled_ai_matrix[stimuli_dictionary["Running"]]
 
     # Zero Running Trace
@@ -170,12 +129,11 @@ def create_behaviour_matrix(data_root_directory, base_directory, mvar_output_dir
     frame_rate = np.load(os.path.join(data_root_directory, base_directory, "Frame_Rate.npy"))
     n_lags = frame_rate * lick_lag
     n_lags = int(np.around(n_lags, 0))
-    print("frame rate", frame_rate)
-    print("n_lags", n_lags)
-    lick_threshold = np.load(os.path.join(data_root_directory, base_directory, "Behaviour", "Lick_Threshold.npy"))
-    lick_regressors = create_lagged_matrix(lick_trace, lick_threshold, n_lags=n_lags)
+    print("n lags", n_lags)
 
-    print("Running Trace", np.shape(running_trace))
+    lick_onsets = np.load(os.path.join(mvar_output_directory, base_directory, "Behaviour", "Lick_Onset_Frames.npy"))
+    lick_regressors = create_lagged_matrix(lick_onsets, n_timepoints, n_lags=n_lags)
+
     # Create Design Matrix
     design_matrix = [
         running_trace,

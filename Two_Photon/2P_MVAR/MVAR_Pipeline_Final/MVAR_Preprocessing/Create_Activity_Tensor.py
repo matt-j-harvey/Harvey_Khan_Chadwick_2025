@@ -20,7 +20,7 @@ def moving_average(df_matrix, window_size=2):
 def create_activity_tensor(data_root_directory, session, mvar_output_directory, onsets_file, start_window, stop_window):
 
     # Load Activity Matrix
-    activity_matrix = np.load(os.path.join(data_root_directory, session, "df_over_f_matrix.npy"))
+    activity_matrix = np.load(os.path.join(mvar_output_directory, session, "df_over_f_matrix.npy"))
     #activity_matrix = moving_average(activity_matrix)
     number_of_timepoints, number_of_components = np.shape(activity_matrix)
     print("DF Matrix", np.shape(activity_matrix))

@@ -2,6 +2,7 @@ import numpy as np
 import os
 import matplotlib.pyplot as plt
 
+import MVAR_Preprocessing_Utils
 
 """
 0 trial_index	
@@ -30,6 +31,54 @@ import matplotlib.pyplot as plt
 23 reaction_time	
 24 reward_onset
 """
+
+def get_onsets(downsampled_trace, threhold, preceeding_window):
+
+    n_timepoints = len(downsampled_trace)
+    lick_onsets = []
+    for timepoint_index in range(preceeding_window, n_timepoints):
+
+        timepoint_data = downsampled_trace[timepoint_index]
+        timepoint_preceeding_window = downsampled_trace[timepoint_index-preceeding_window:timepoint_index]
+
+        if timepoint_data > threhold:
+            if np.max(timepoint_preceeding_window) < threhold:
+                lick_onsets.append(timepoint_index)
+
+    return lick_onsets
+
+
+def extract_lick_onsets(data_root_directory, session, mvar_output_directory):
+
+    # Load Lick Threshold
+    lick_threshold = np.load(os.path.join(data_root_directory, session, "Behaviour", "Lick_Threshold.npy"))
+
+    # Load Downsampled AI Matrix
+    ai_data = np.load(os.path.join(mvar_output_directory, session, "Behaviour", "Downsampled_AI_Matrix_Framewise.npy"))
+
+    # Load Stimuli Dict
+    stimuli_dict = MVAR_Preprocessing_Utils.load_rig_1_channel_dict()
+
+    # Load Frame Rate
+    frame_rate = np.load(os.path.join(data_root_directory, session, "Frame_Rate.npy"))
+
+    # Get Lick Trace
+    downsampled_lick_trace = ai_data[stimuli_dict["Lick"]]
+
+    # Get onsets
+    preceeding_window = int(np.ceil(1.5 * frame_rate))
+    lick_onsets = get_onsets(downsampled_lick_trace, lick_threshold, preceeding_window=preceeding_window)
+
+    """
+    plt.plot(downsampled_lick_trace)
+    plt.scatter(lick_onsets, np.multiply(np.ones(len(lick_onsets)), lick_threshold), c='k')
+    plt.show()
+    """
+
+    # Save Onset Frames
+    np.save(os.path.join(mvar_output_directory, session, "Behaviour", "Lick_Onset_Frames.npy"), lick_onsets)
+
+
 
 
 def extract_odour_onsets(base_directory):

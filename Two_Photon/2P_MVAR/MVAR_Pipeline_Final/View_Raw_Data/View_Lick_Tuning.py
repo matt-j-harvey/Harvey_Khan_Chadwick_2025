@@ -31,7 +31,7 @@ def get_lick_coding_dimension(base_directory):
 def view_lick_tuning(data_root, session, mvar_output_root):
 
     # Load DF Data
-    df_matrix = np.load(os.path.join(data_root, session, "df_over_f_matrix.npy"))
+    df_matrix = np.load(os.path.join(mvar_output_root, session, "df_over_f_matrix.npy"))
     print("df matrix", np.shape(df_matrix))
 
     # Load Lick Onsets
@@ -43,7 +43,7 @@ def view_lick_tuning(data_root, session, mvar_output_root):
     period = float(1)/frame_rate
 
     # Get Data Tensor
-    start_window = -int(2.5 * frame_rate)
+    start_window = -int(1.5 * frame_rate)
     stop_window = int(1 * frame_rate)
     print("start_window", start_window, "stop_window", stop_window)
 
