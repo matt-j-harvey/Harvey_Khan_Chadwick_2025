@@ -61,7 +61,6 @@ def visualise_mvar_results_session(data_root_directory, mvar_directory, session_
         "odour_1",
         "odour_2"]
 
-
     # Plot Individual Sessions
     for session in session_list:
 
@@ -71,7 +70,7 @@ def visualise_mvar_results_session(data_root_directory, mvar_directory, session_
         # Load Frame Rate
         frame_rate = np.load(os.path.join(data_root_directory, session, "Frame_Rate.npy"))
         x_values = Visualise_Results_Utils.get_time_x_values(timewindow, frame_rate)
-        """
+
         # Load Model Dictionary
         model_dict = np.load(os.path.join(mvar_directory, session, "Full_Model", model_type + "_Model_Dict.npy"), allow_pickle=True)[()]
         print("model dict", model_dict.keys())
@@ -105,16 +104,19 @@ def visualise_mvar_results_session(data_root_directory, mvar_directory, session_
         # Plot Partitioned Contribution
         MVAR_Output_Plotting_Functions.plot_partitioned_contributions(save_directory, stimulus_list, frame_rate)
         MVAR_Output_Plotting_Functions.plot_partitioned_lick_cds(save_directory, stimulus_list, frame_rate)
-    """
 
     # Plot Group Results
     MVAR_Output_Plotting_Functions.plot_group_lick_cd_projections(mvar_directory, session_list, model_type, stimulus_list[0:4], x_values)
     MVAR_Output_Plotting_Functions.plot_group_partitioned_lick_cd_projections(mvar_directory, session_list, model_type, stimulus_list[0:4], x_values)
 
 
-# File Directory Info
-data_root = r"C:\Users\matth\OneDrive - The Francis Crick Institute\Documents\Neurexin_Paper\ALM 2P\Data\Controls"
-mvar_output_root = r"C:\Users\matth\OneDrive - The Francis Crick Institute\Documents\Neurexin_Paper\ALM 2P\Full_Pipeline_Results"
+
+
+# Output directory where you want the data to be saved to
+mvar_output_root = r"C:\Users\matth\Documents\PhD Docs\ALM 2P\Results\MVAR"
+
+# Directory which contains raw data
+data_root = r"C:\Users\matth\Documents\PhD Docs\ALM 2P\Data\Controls"
 
 control_session_list = [
     r"65.2a\2024_08_05_Switching",
@@ -125,8 +127,7 @@ control_session_list = [
     r"72.3C\2024_09_10_Switching",
 ]
 
-
 visualise_mvar_results_session(data_root, mvar_output_root, control_session_list, "Standard")
-    #visualise_mvar_results_session(data_root, mvar_output_root, session, "No_Recurrent")
+
 
 

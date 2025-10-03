@@ -8,7 +8,7 @@ import Get_Previous_Step_R2
 import Fit_Diagonal_with_Stimuli
 
 
-def plot_model_results(response_only, diagonal, standard, seperate_contexts):
+def plot_model_results(response_only, diagonal, standard, seperate_contexts, save_directory):
 
     # Create Score Matrix
     response_only = np.expand_dims(response_only, 1)
@@ -53,8 +53,9 @@ def plot_model_results(response_only, diagonal, standard, seperate_contexts):
 
     t_stat, p_value = stats.ttest_rel(score_matrix[:, 3], score_matrix[:, 2], axis=0)
     print("Seperate Contexts", t_stat, "p_value", p_value)
-    plt.show()
 
+    plt.savefig(os.path.join(save_directory, "Cross_Validated_r2.png"))
+    plt.close()
 
 
 def model_comparison_pipeline(mvar_output_root, session_list):
@@ -67,10 +68,7 @@ def model_comparison_pipeline(mvar_output_root, session_list):
     for session in session_list:
 
         # Get Diagonal With Stim R2
-        #Fit_Diagonal_with_Stimuli.fit_diagonal_with_stimuli(mvar_output_root, session)
-
-        # Get Previous Step R2
-        #previous_step_2 = Get_Previous_Step_R2.get_previous_step_r2(mvar_output_root, session)
+        Fit_Diagonal_with_Stimuli.fit_diagonal_with_stimuli(mvar_output_root, session)
 
         # Get Response + Behaviour
         response_behaviour_scores = np.load(os.path.join(mvar_output_root, session, "Ridge_Penalty_Search", "No_Recurrent", "Ridge_Penalty_Search_Results.npy"))
@@ -93,10 +91,16 @@ def model_comparison_pipeline(mvar_output_root, session_list):
         diag_stim_list.append(no_reurrent_r2)
         #print("Session", session, "Previous_Step_R2", previous_step_2, "no recurrent r2", no_reurrent_r2, "Standard Model", standard_r2, "Seperate Context R2", seperate_r2)
 
+
+    save_directory = os.path.join(mvar_output_root, "Group_Results", "MVAR_Model_Fits")
+    if not os.path.exists(save_directory):
+        os.makedirs(save_directory)
+
     plot_model_results(response_only_list,
                        diag_stim_list,
                        standard_list,
-                       seperate_contexts_list)
+                       seperate_contexts_list,
+                       save_directory)
 
     t_stat, p_value = stats.ttest_rel(standard_list, diag_stim_list)
     print("t_stat", t_stat, "p_value", p_value)
@@ -112,13 +116,12 @@ Different model types:
 "Seperate_Contexts"
 """
 
-# File Directory Info
-data_root = r"C:\Users\matth\OneDrive - The Francis Crick Institute\Documents\Neurexin_Paper\ALM 2P\Data\Controls"
-mvar_output_root = r"C:\Users\matth\OneDrive - The Francis Crick Institute\Documents\Neurexin_Paper\ALM 2P\2P_MVAR_Results_Final_No_Z"
-mvar_output_root = r"C:\Users\matth\OneDrive - The Francis Crick Institute\Documents\Neurexin_Paper\ALM 2P\Full_Pipeline_Results_MW1"
-mvar_output_root = r"C:\Users\matth\OneDrive - The Francis Crick Institute\Documents\Neurexin_Paper\ALM 2P\Full_Pipeline_Results"
 
+# Output directory where you want the data to be saved to
+mvar_output_root = r"C:\Users\matth\Documents\PhD Docs\ALM 2P\Results\MVAR"
 
+# Directory which contains raw data
+data_root = r"C:\Users\matth\Documents\PhD Docs\ALM 2P\Data\Controls"
 
 control_session_list = [
     r"65.2a\2024_08_05_Switching",
@@ -128,6 +131,7 @@ control_session_list = [
     r"69.2a\2024_08_12_Switching",
     r"72.3C\2024_09_10_Switching",
 ]
+
 
 # Model Info
 start_window = -17

@@ -43,7 +43,7 @@ def view_lick_tuning(data_root, session, mvar_output_root):
     period = float(1)/frame_rate
 
     # Get Data Tensor
-    start_window = -int(1.5 * frame_rate)
+    start_window = -int(2 * frame_rate)
     stop_window = int(1 * frame_rate)
     print("start_window", start_window, "stop_window", stop_window)
 
