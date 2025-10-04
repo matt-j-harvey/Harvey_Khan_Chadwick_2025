@@ -17,7 +17,7 @@ def get_integrated_interaction(stimulus_vector, recurrent_weights, duration=9):
     return trial_vector
 
 
-def get_stimuli_recurrent_interactions(data_directory, session, output_directory, weight_matrix_file):
+def get_stimuli_recurrent_interactions(mvar_root_directory, session, output_directory, weight_matrix_file):
 
     stimuli_list = [
         "visual_context_vis_1",
@@ -32,7 +32,7 @@ def get_stimuli_recurrent_interactions(data_directory, session, output_directory
         os.makedirs(save_directory)
 
     # Load Lick CD
-    lick_cd = np.load(os.path.join(data_directory, session, "Coding_Dimensions", "Lick_CD.npy"))
+    lick_cd = np.load(os.path.join(mvar_root_directory, session, "Lick_Tuning", "Lick_Coding_Dimension.npy"))
     lick_cd = np.expand_dims(lick_cd, axis=1)
 
     # Load Weight Matrix

@@ -240,7 +240,7 @@ def plot_group_lick_cd_projections(output_root, session_list, model_type, stimul
 
 
     # Create Plot Save Directory
-    save_directory = os.path.join(output_root, "Group_Lick_CD_Projections", model_type)
+    save_directory = os.path.join(output_root, "Group_Results", "MVAR_Results")
     if not os.path.exists(save_directory):
         os.makedirs(save_directory)
 
@@ -283,8 +283,11 @@ def plot_group_lick_cd_projections(output_root, session_list, model_type, stimul
                                               alpha=0.1)
 
         # Add To Combined projection To Later Get Y lims
-        combined_projection_list.append(stimulus_real_mean)
-        combined_projection_list.append(stimulus_predicted_mean)
+        combined_projection_list.append(np.add(stimulus_real_mean, real_sem))
+        combined_projection_list.append(np.add(stimulus_predicted_mean, predicted_sem))
+
+        combined_projection_list.append(np.subtract(stimulus_real_mean, real_sem))
+        combined_projection_list.append(np.subtract(stimulus_predicted_mean, predicted_sem))
 
     # Get YLim
     combined_data = np.concatenate(combined_projection_list)
@@ -312,7 +315,7 @@ def plot_group_lick_cd_projections(output_root, session_list, model_type, stimul
     predicted_axis.set_title("Predicted")
 
     # Save Fig
-    plt.savefig(os.path.join(save_directory, "Lick_CD_Predictions.png"))
+    plt.savefig(os.path.join(save_directory, model_type + "_Lick_CD_Predictions.png"))
     plt.close()
 
 
@@ -515,6 +518,95 @@ def plot_partitioned_lick_cds(output_directory, stimulus_list, frame_rate):
 
 
 
+def plot_recurrent_sum(save_directory, stim_sum, recurrent_sum):
+
+    # Test Sum Signfifance
+    rewarded_stim_sum_t_stat, rewarded_stim_sum_p_value = stats.ttest_rel(stim_sum[:, 0], stim_sum[:, 2])
+    rewarded_recurrent_sum_t_stat, rewarded_recurrent_sum_p_value = stats.ttest_rel(recurrent_sum[:, 0], recurrent_sum[:, 2])
+    unrewarded_stim_sum_t_stat, unrewarded_stim_sum_p_value = stats.ttest_rel(stim_sum[:, 1], stim_sum[:, 3])
+    unrewarded_recurrent_sum_t_stat, unrewarded_recurrent_sum_p_value = stats.ttest_rel(recurrent_sum[:, 1], recurrent_sum[:, 3])
+
+    print("rewarded_stim_sum_t_stat", rewarded_stim_sum_t_stat, "rewarded_stim_sum_p_value", rewarded_stim_sum_p_value)
+    print("rewarded_recurrent_sum_t_stat", rewarded_recurrent_sum_t_stat, "rewarded_recurrent_sum_p_value", rewarded_recurrent_sum_p_value)
+    print("unrewarded_stim_sum_t_stat", unrewarded_stim_sum_t_stat, "unrewarded_stim_sum_p_value", unrewarded_stim_sum_p_value)
+    print("unrewarded_recurrent_sum_t_stat", unrewarded_recurrent_sum_t_stat, "unrewarded_recurrent_sum_p_value", unrewarded_recurrent_sum_p_value)
+
+
+    # Get Mean Sums
+    mean_stim_sum = np.mean(stim_sum, axis=0)
+    mean_recurrent_sum = np.mean(recurrent_sum, axis=0)
+    print("mean stim sum", np.shape(mean_stim_sum))
+
+    # Plot
+    figure_1 = plt.figure()
+    axis_1 = figure_1.add_subplot(1,1,1)
+
+
+    # Bar Settings
+    bar_width = 0.2
+    inter_group_spacing = 2
+    intra_group_spacing = 0.6
+    bar_halfwidth = bar_width / 2
+
+    bar_positions = [
+        (0 * inter_group_spacing) + (0 * intra_group_spacing) - bar_halfwidth,
+        (0 * inter_group_spacing) + (0 * intra_group_spacing) + bar_halfwidth,
+
+        (0 * inter_group_spacing) + (1 * intra_group_spacing) - bar_halfwidth,
+        (0 * inter_group_spacing) + (1 * intra_group_spacing) + bar_halfwidth,
+
+        (1 * inter_group_spacing) + (0 * intra_group_spacing) - bar_halfwidth,
+        (1 * inter_group_spacing) + (0 * intra_group_spacing) + bar_halfwidth,
+
+        (1 * inter_group_spacing) + (1 * intra_group_spacing) - bar_halfwidth,
+        (1 * inter_group_spacing) + (1 * intra_group_spacing) + bar_halfwidth,
+    ]
+
+
+
+
+    # Plot Bars
+    axis_1.bar(bar_positions[0], mean_stim_sum[2], width=0.2, edgecolor='Green', facecolor='Green', alpha=0.5, linewidth=2)
+    axis_1.bar(bar_positions[1], mean_stim_sum[0], width=0.2, edgecolor='Blue', facecolor='Blue', alpha=0.5, linewidth=2)
+
+    axis_1.bar(bar_positions[2], mean_stim_sum[3], width=0.2, edgecolor='Purple', facecolor='Purple', alpha=0.5, linewidth=2)
+    axis_1.bar(bar_positions[3], mean_stim_sum[1], width=0.2, edgecolor='Red', facecolor='Red', alpha=0.5, linewidth=2)
+
+    axis_1.bar(bar_positions[4], mean_recurrent_sum[2], width=0.2, edgecolor='Green', facecolor='Green', alpha=0.5, linewidth=2)
+    axis_1.bar(bar_positions[5], mean_recurrent_sum[0], width=0.2, edgecolor='Blue', facecolor='Blue', alpha=0.5, linewidth=2)
+
+    axis_1.bar(bar_positions[6], mean_recurrent_sum[3], width=0.2, edgecolor='Purple', facecolor='Purple', alpha=0.5, linewidth=2)
+    axis_1.bar(bar_positions[7], mean_recurrent_sum[1], width=0.2, edgecolor='Red', facecolor='Red', alpha=0.5, linewidth=2)
+
+
+    # Plot Lines + Scatters
+    n_mice = np.shape(stim_sum)[0]
+    for mouse_index in range(n_mice):
+
+        axis_1.plot([bar_positions[0], bar_positions[1]], [stim_sum[mouse_index, 2], stim_sum[mouse_index, 0]], c='k', alpha=0.5)
+        axis_1.scatter([bar_positions[0], bar_positions[1]], [stim_sum[mouse_index, 2], stim_sum[mouse_index, 0]], c='k', alpha=0.5)
+
+        axis_1.plot([bar_positions[2], bar_positions[3]], [stim_sum[mouse_index, 3], stim_sum[mouse_index, 1]], c='k', alpha=0.5)
+        axis_1.scatter([bar_positions[2], bar_positions[3]], [stim_sum[mouse_index, 3], stim_sum[mouse_index, 1]], c='k', alpha=0.5)
+
+
+        axis_1.plot([bar_positions[4], bar_positions[5]], [recurrent_sum[mouse_index, 2], recurrent_sum[mouse_index, 0]], c='k', alpha=0.5)
+        axis_1.scatter([bar_positions[4], bar_positions[5]], [recurrent_sum[mouse_index, 2], recurrent_sum[mouse_index, 0]], c='k', alpha=0.5)
+
+        axis_1.plot([bar_positions[6], bar_positions[7]], [recurrent_sum[mouse_index, 3], recurrent_sum[mouse_index, 1]], c='k', alpha=0.5)
+        axis_1.scatter([bar_positions[6], bar_positions[7]], [recurrent_sum[mouse_index, 3], recurrent_sum[mouse_index, 1]], c='k', alpha=0.5)
+
+
+    axis_1.spines[['right', 'top']].set_visible(False)
+
+    axis_1.set_xticks([np.mean(bar_positions[0:4]), np.mean(bar_positions[4:])], labels=["Stimulus", "Recurrent"])
+
+    axis_1.set_ylabel("Summed Lick CD Projection")
+
+    # Save Plot
+    plt.savefig(os.path.join(save_directory, "Summed_Lick_CD_Partitioned_Contributions.png"))
+    plt.close()
+   
 
 def plot_group_partitioned_lick_cd_projections(output_root, session_list, model_type, stimulus_list, x_values, colour_list=["b", "r", "g", "m", "orange", "brown"]):
 
@@ -536,7 +628,7 @@ def plot_group_partitioned_lick_cd_projections(output_root, session_list, model_
     group_recurrent_list = np.array(group_recurrent_list)
 
     # Create Plot Save Directory
-    save_directory = os.path.join(output_root, "Group_Lick_CD_Projections", model_type)
+    save_directory = os.path.join(output_root, "Group_Results", "MVAR_Results")
     if not os.path.exists(save_directory):
         os.makedirs(save_directory)
 
@@ -612,5 +704,13 @@ def plot_group_partitioned_lick_cd_projections(output_root, session_list, model_
     recurrent_axis.set_title("Recurrence")
 
     # Save Fig
-    plt.savefig(os.path.join(save_directory, "Lick_CD_Predictions_Partitioned.png"))
+    plt.savefig(os.path.join(save_directory, model_type + "_Lick_CD_Predictions_Partitioned.png"))
     plt.close()
+
+    print("group stimuli list", np.shape(group_stimuli_list))
+
+    # Sum Differences ad Plot Bar Chart
+    recurrent_sum = np.sum(group_recurrent_list[:, :, -9:], axis=2)
+    stim_sum = np.sum(group_stimuli_list[:, :, -9:], axis=2)
+    print("x values", x_values)
+    plot_recurrent_sum(save_directory, stim_sum, recurrent_sum)

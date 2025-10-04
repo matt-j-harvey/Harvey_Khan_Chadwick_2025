@@ -48,25 +48,21 @@ def plot_scatters(mvar_output_directory, session_list):
     # Load Results
     group_diagonal = load_group_results(mvar_output_directory, session_list, "diagonal_weights")
     group_recurrent = load_group_results(mvar_output_directory, session_list, "recurrent_weights")
-    group_shuffled = load_group_results(mvar_output_directory, session_list, "shuffled_recurrent_weights")
-    print("group_diagonal", np.shape(group_diagonal))
 
     # Squeeze!
     group_diagonal = np.squeeze(group_diagonal)
     group_recurrent = np.squeeze(group_recurrent)
-    group_shuffled = np.squeeze(group_shuffled)
 
     # Sum Over Time
     group_diagonal = np.sum(group_diagonal, axis=2)
     group_recurrent = np.sum(group_recurrent, axis=2)
-    group_shuffled = np.sum(group_shuffled, axis=2)
 
     # Create X Bins
     jitter_size = 0.05
-    x_positions = np.array([0, 1, 2])
+    x_positions = np.array([0, 1])
 
     # Create Save Directory
-    save_directory = os.path.join(mvar_output_directory, "Stimuli Weight Interactions")
+    save_directory = os.path.join(mvar_output_directory, "Group_Results", "Stimuli Weight Interactions")
     if not os.path.exists(save_directory):
         os.makedirs(save_directory)
 
@@ -85,31 +81,27 @@ def plot_scatters(mvar_output_directory, session_list):
             # Get Mouse Colour
             mouse_colour = colourmap(float(mouse_index)/n_mice)
 
-            mouse_jitter = np.random.uniform(low=-jitter_size, high=jitter_size, size=3)
+            mouse_jitter = np.random.uniform(low=-jitter_size, high=jitter_size, size=2)
             x_values = np.add(mouse_jitter, x_positions)
 
             y_values = [group_diagonal[mouse_index, stimulus_index],
-                        group_recurrent[mouse_index, stimulus_index],
-                        group_shuffled[mouse_index, stimulus_index]]
+                        group_recurrent[mouse_index, stimulus_index]]
 
             axis_1.plot(x_values, y_values, alpha=0.4, c=mouse_colour)
             axis_1.scatter(x_values, y_values, c=mouse_colour)
 
 
-        t_stat, p_value = stats.ttest_rel(group_diagonal[:, stimulus_index],group_recurrent[:, stimulus_index], axis=0)
-        print("recurrent v diagonal", "t_stat", t_stat, "p_value", p_value)
-
-        t_stat, p_value = stats.ttest_rel(group_shuffled[:, stimulus_index],group_recurrent[:, stimulus_index], axis=0)
-        print("recurrent v shuffle", "t_stat", t_stat, "p_value", p_value)
+        #t_stat, p_value = stats.ttest_rel(group_diagonal[:, stimulus_index],group_recurrent[:, stimulus_index], axis=0)
+        #print("recurrent v diagonal", "t_stat", t_stat, "p_value", p_value)
 
         # Remove Splines
         axis_1.spines[['right', 'top']].set_visible(False)
 
         # Set X Ticks
-        axis_1.set_xticks([0, 1, 2], labels=["Diagonal Only", "Recurrent", "Recurrent Shuffled"])
+        axis_1.set_xticks([0, 1], labels=["Diagonal Only", "Recurrent"])
 
         # Set X Axis Extent
-        axis_1.set_xlim([-0.5, 2.5])
+        axis_1.set_xlim([-0.5, 1.5])
 
         # Set Y Label
         axis_1.set_ylabel("Total lick CD projection")
@@ -126,24 +118,20 @@ def plot_session_interactions(output_directory):
     # Load Data
     diagonal_data = np.load(os.path.join(output_directory,"Stimuli_Weight_Interactions", "diagonal_weights_Interaction.npy"))
     recurrent_data = np.load(os.path.join(output_directory,"Stimuli_Weight_Interactions", "recurrent_weights_Interaction.npy"))
-    shuffled_data = np.load(os.path.join(output_directory, "Stimuli_Weight_Interactions", "shuffled_recurrent_weights_Interaction.npy"))
 
     # Create Figure
     figure_1 = plt.figure(figsize=(20, 5))
-    diagonal_axis = figure_1.add_subplot(1, 3, 1)
-    recurrent_axis = figure_1.add_subplot(1, 3, 2)
-    shuffled_axis = figure_1.add_subplot(1, 3, 3)
+    diagonal_axis = figure_1.add_subplot(1, 2, 1)
+    recurrent_axis = figure_1.add_subplot(1, 2, 2)
 
     # Plot Data
     n_stimuli = 4
     for stimulus_index in range(n_stimuli):
         diagonal_axis.plot(diagonal_data[stimulus_index])
         recurrent_axis.plot(recurrent_data[stimulus_index])
-        shuffled_axis.plot(shuffled_data[stimulus_index])
 
     plt.savefig(os.path.join(output_directory, "Stimuli_Weight_Interactions.png"))
     plt.close()
-    print("diagonal data", np.shape(diagonal_data))
 
 
 def plot_group_interactions(mvar_output_directory, session_list, colour_list=["b", "r", "g", "m"]):
@@ -151,7 +139,6 @@ def plot_group_interactions(mvar_output_directory, session_list, colour_list=["b
     # Load Results
     group_diagonal = load_group_results(mvar_output_directory, session_list, "diagonal_weights")
     group_recurrent = load_group_results(mvar_output_directory, session_list, "recurrent_weights")
-    print("group_diagonal", np.shape(group_diagonal))
 
     # Squeeze!
     group_diagonal = np.squeeze(group_diagonal)
@@ -171,8 +158,8 @@ def plot_group_interactions(mvar_output_directory, session_list, colour_list=["b
     x_values = list(range(0, n_timepoints))
 
     # Get Magnitude
-    max_value = np.max(np.concatenate([diagonal_upper_bound, recurrent_upper_bound, shuffled_upper_bound])) * 1.2
-    min_value = np.min(np.concatenate([diagonal_lower_bound, recurrent_lower_bound, shuffled_lower_bound])) * 1.2
+    max_value = np.max(np.concatenate([diagonal_upper_bound, recurrent_upper_bound])) * 1.2
+    min_value = np.min(np.concatenate([diagonal_lower_bound, recurrent_lower_bound])) * 1.2
 
     # Plot Data
     n_stimuli = 4
@@ -202,7 +189,7 @@ def plot_group_interactions(mvar_output_directory, session_list, colour_list=["b
     recurrent_axis.spines[['right', 'top']].set_visible(False)
 
     # Save Figure
-    save_directory = os.path.join(mvar_output_directory, "Stimuli Weight Interactions")
+    save_directory = os.path.join(mvar_output_directory, "Group_Results", "Stimuli Weight Interactions")
     if not os.path.exists(save_directory):
         os.makedirs(save_directory)
 
@@ -218,17 +205,14 @@ def plot_total_interactions(mvar_output_directory, session_list):
     # Load Results
     group_diagonal = load_group_results(mvar_output_directory, session_list, "diagonal_weights")
     group_recurrent = load_group_results(mvar_output_directory, session_list, "recurrent_weights")
-    print("group_diagonal", np.shape(group_diagonal))
 
     # Squeeze!
     group_diagonal = np.squeeze(group_diagonal)
     group_recurrent = np.squeeze(group_recurrent)
-    print("group_diagonal", np.shape(group_diagonal))
 
     # Sum Over Time
     group_diagonal = np.sum(group_diagonal, axis=2)
     group_recurrent = np.sum(group_recurrent, axis=2)
-    print("group_diagonal", np.shape(group_diagonal))
 
     # Get Mean Across Group
     mean_group_diagonal = np.mean(group_diagonal, axis=0)
@@ -292,13 +276,20 @@ def plot_total_interactions(mvar_output_directory, session_list):
 
     # Perform T Tests
     stim_list = ["Rewarded Relevant", "Unrewarded Relevant", "Rewarded Irrelevant", "Unrewarded Irrelevant"]
+    print("Total Interaction T Stats")
     for stimuli_index in range(4):
         t_stat, p_value = stats.ttest_rel(group_diagonal[:, stimuli_index], group_recurrent[:, stimuli_index])
         t_stat = np.around(t_stat, 3)
         p_value = np.around(p_value, 3)
         print(stim_list[stimuli_index], "T stat: ", t_stat, "P value ", p_value)
 
-    plt.show()
+    # Save Figure
+    save_directory = os.path.join(mvar_output_directory, "Group_Results", "Stimuli Weight Interactions")
+    if not os.path.exists(save_directory):
+        os.makedirs(save_directory)
+
+    plt.savefig(os.path.join(save_directory, "Summed_Interaction_Plot.png"))
+    plt.close()
 
 
 
@@ -307,21 +298,17 @@ def compare_modulation_interaction(mvar_output_directory, session_list):
     # Load Results
     group_diagonal = load_group_results(mvar_output_directory, session_list, "diagonal_weights")
     group_recurrent = load_group_results(mvar_output_directory, session_list, "recurrent_weights")
-    print("group_diagonal", np.shape(group_diagonal))
 
     # Squeeze!
     group_diagonal = np.squeeze(group_diagonal)
     group_recurrent = np.squeeze(group_recurrent)
-    print("group_diagonal", np.shape(group_diagonal))
 
     # Sum Over Time
     group_diagonal = np.sum(group_diagonal, axis=2)
     group_recurrent = np.sum(group_recurrent, axis=2)
-    print("group_diagonal", np.shape(group_diagonal))
 
     # Get Amplification
     amplification = np.subtract(group_recurrent, group_diagonal)
-    print("amplification", np.shape(amplification))
 
     # Extract Vis 1
     rel_amplification = amplification[:, 0]
@@ -333,8 +320,7 @@ def compare_modulation_interaction(mvar_output_directory, session_list):
 
     # Test Significance
     t_stat, p_value = stats.ttest_rel(rel_amplification, irrel_amplification)
-    print("t_stat", t_stat)
-    print("p_value", p_value)
+    print("Modulation t stat", t_stat, "p value", p_value)
 
     # Plot These
     figure_1 = plt.figure(figsize=(4, 7))
@@ -364,4 +350,10 @@ def compare_modulation_interaction(mvar_output_directory, session_list):
 
     axis_1.set_xticks([0.9, 1.1], labels=["Irrelevant", "Relevant"])
 
-    plt.show()
+    # Save Figure
+    save_directory = os.path.join(mvar_output_directory, "Group_Results", "Stimuli Weight Interactions")
+    if not os.path.exists(save_directory):
+        os.makedirs(save_directory)
+
+    plt.savefig(os.path.join(save_directory, "Modulation_Interaction.png"))
+    plt.close()

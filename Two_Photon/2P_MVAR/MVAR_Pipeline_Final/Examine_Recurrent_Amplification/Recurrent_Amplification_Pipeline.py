@@ -11,7 +11,6 @@ import Plot_Stimuli_Weight_Interactions
 
 def recurrent_amplification_pipeline(data_root_directory, mvar_directory, session_list):
 
-    """
     # Plot Individual Sessions
     for session in session_list:
 
@@ -29,8 +28,8 @@ def recurrent_amplification_pipeline(data_root_directory, mvar_directory, sessio
         Get_Recurrent_Weights.get_recurrent_weights(model_dict, output_directory)
 
         # Get Interactions - Diagonal and Recurrent
-        Get_Stimuli_Recurrent_Interactions.get_stimuli_recurrent_interactions(data_root_directory, session, output_directory, "recurrent_weights")
-        Get_Stimuli_Recurrent_Interactions.get_stimuli_recurrent_interactions(data_root_directory, session, output_directory, "diagonal_weights")
+        Get_Stimuli_Recurrent_Interactions.get_stimuli_recurrent_interactions(mvar_directory, session, output_directory, "recurrent_weights")
+        Get_Stimuli_Recurrent_Interactions.get_stimuli_recurrent_interactions(mvar_directory, session, output_directory, "diagonal_weights")
 
         # Plot Recurrent interactions
         Plot_Stimuli_Weight_Interactions.plot_session_interactions(output_directory)
@@ -38,16 +37,16 @@ def recurrent_amplification_pipeline(data_root_directory, mvar_directory, sessio
     # Plot Group Results
     Plot_Stimuli_Weight_Interactions.plot_group_interactions(mvar_directory, session_list)
     Plot_Stimuli_Weight_Interactions.plot_scatters(mvar_directory, session_list)
-    """
 
-    #Plot_Stimuli_Weight_Interactions.plot_total_interactions(mvar_directory, session_list)
+    Plot_Stimuli_Weight_Interactions.plot_total_interactions(mvar_directory, session_list)
     Plot_Stimuli_Weight_Interactions.compare_modulation_interaction(mvar_directory, session_list)
 
 
-# File Directory Info
-data_root = r"C:\Users\matth\OneDrive - The Francis Crick Institute\Documents\Neurexin_Paper\ALM 2P\Data\Controls"
-mvar_output_root = r"C:\Users\matth\OneDrive - The Francis Crick Institute\Documents\Neurexin_Paper\ALM 2P\Full_Pipeline_Results"
-#mvar_output_root = r"C:\Users\matth\OneDrive - The Francis Crick Institute\Documents\Neurexin_Paper\ALM 2P\Full_Pipeline_Results_Positive_Only"
+# Output directory where you want the data to be saved to
+mvar_output_root = r"C:\Users\matth\Documents\PhD Docs\ALM 2P\Results\MVAR"
+
+# Directory which contains raw data
+data_root = r"C:\Users\matth\Documents\PhD Docs\ALM 2P\Data\Controls"
 
 control_session_list = [
     r"65.2a\2024_08_05_Switching",

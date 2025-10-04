@@ -60,7 +60,7 @@ def get_lick_cd_projection(tensor, lick_cd):
 
 
 
-def partition_model_contributions(data_directory, session, design_matrix, Nvar, Nt, Nstim, Ntrials, model_dict, output_directory, baseline_correction=True, baseline=[0,5]):
+def partition_model_contributions(mvar_directory_root, session, design_matrix, Nvar, Nt, Nstim, Ntrials, model_dict, output_directory, baseline_correction=True, baseline=[0,5]):
 
     # Load Model Params
     model_params = model_dict['MVAR_Parameters']
@@ -81,7 +81,7 @@ def partition_model_contributions(data_directory, session, design_matrix, Nvar, 
     print("recurrent contribution", np.shape(recurrent_contribution))
 
     # Load Lick CD
-    lick_cd = np.load(os.path.join(data_directory, session, "Coding_Dimensions", "Lick_CD.npy"))
+    lick_cd = np.load(os.path.join(mvar_directory_root, session, "Lick_Tuning", "Lick_Coding_Dimension.npy"))
     lick_cd = np.expand_dims(lick_cd, axis=1)
     print("Lick CD", np.shape(lick_cd))
 

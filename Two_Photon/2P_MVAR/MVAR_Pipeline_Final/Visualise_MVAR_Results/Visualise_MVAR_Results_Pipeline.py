@@ -81,7 +81,7 @@ def visualise_mvar_results_session(data_root_directory, mvar_directory, session_
             os.makedirs(save_directory)
 
         # Extract Model Predictions
-        Extract_Model_Predictions.extract_model_predictions(data_root_directory, session, design_matrix, delta_f_matrix, Nvar, Nt, Nstim, Ntrials, model_dict, stimulus_list, save_directory)
+        Extract_Model_Predictions.extract_model_predictions(mvar_directory, session, design_matrix, delta_f_matrix, Nvar, Nt, Nstim, Ntrials, model_dict, stimulus_list, save_directory)
 
         # Plot Full Raster
         MVAR_Output_Plotting_Functions.plot_full_raster(delta_f_matrix, save_directory)
@@ -99,7 +99,7 @@ def visualise_mvar_results_session(data_root_directory, mvar_directory, session_
         MVAR_Output_Plotting_Functions.plot_stim_weights(model_dict, frame_rate, save_directory)
 
         # Partition Contributions
-        Partition_Contributions.partition_model_contributions(data_root_directory, session, design_matrix, Nvar, Nt, Nstim, Ntrials, model_dict, save_directory)
+        Partition_Contributions.partition_model_contributions(mvar_directory, session, design_matrix, Nvar, Nt, Nstim, Ntrials, model_dict, save_directory)
 
         # Plot Partitioned Contribution
         MVAR_Output_Plotting_Functions.plot_partitioned_contributions(save_directory, stimulus_list, frame_rate)

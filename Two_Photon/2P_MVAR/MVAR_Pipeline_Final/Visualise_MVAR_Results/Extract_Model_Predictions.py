@@ -22,7 +22,7 @@ def baseline_correct_tensor(tensor, baseline_window):
 
 
 
-def extract_model_predictions(data_directory, session, design_matrix, delta_f_matrix, Nvar, Nt, Nstim, Ntrials, model_dict, stimulus_list, save_directory, basline_correction=True, baseline=[0,5]):
+def extract_model_predictions(mvar_directory_root, session, design_matrix, delta_f_matrix, Nvar, Nt, Nstim, Ntrials, model_dict, stimulus_list, save_directory, basline_correction=True, baseline=[0,5]):
 
     # Load Model Params
     model_params = model_dict['MVAR_Parameters']
@@ -65,7 +65,7 @@ def extract_model_predictions(data_directory, session, design_matrix, delta_f_ma
     # Get Stimuli Lick CD Projections
 
     # Load Lick CD
-    lick_cd = np.load(os.path.join(data_directory, session, "Coding_Dimensions", "Lick_CD.npy"))
+    lick_cd = np.load(os.path.join(mvar_directory_root, session, "Lick_Tuning", "Lick_Coding_Dimension.npy"))
     lick_cd = np.expand_dims(lick_cd, axis=1)
     print("Lick CD", np.shape(lick_cd))
 
