@@ -64,3 +64,18 @@ def extract_odour_onsets(base_directory):
     np.save(os.path.join(base_directory, "Stimuli_Onsets", "Odour_1_onset_frames.npy"), odour_1_onsets)
     np.save(os.path.join(base_directory, "Stimuli_Onsets", "Odour_2_onset_frames.npy"), odour_2_onsets)
 
+
+
+
+data_root = r"C:\Users\matth\Documents\PhD Docs\ALM 2P\Data\Homs"
+mvar_output_root = r"C:\Users\matth\Documents\PhD Docs\ALM 2P\Results\MVAR\Homs"
+
+session_list = [
+    r"64.1B\2024_09_09_Switching",
+    r"70.1A\2024_09_09_Switching",
+    r"70.1B\2024_09_12_Switching",
+    r"72.1E\2024_08_23_Switching",
+]
+
+for session in session_list:
+    extract_odour_onsets(os.path.join(data_root, session))

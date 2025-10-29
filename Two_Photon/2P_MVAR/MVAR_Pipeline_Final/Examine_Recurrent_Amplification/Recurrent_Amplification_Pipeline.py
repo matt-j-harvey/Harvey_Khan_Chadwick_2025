@@ -43,10 +43,10 @@ def recurrent_amplification_pipeline(data_root_directory, mvar_directory, sessio
 
 
 # Output directory where you want the data to be saved to
-mvar_output_root = r"C:\Users\matth\Documents\PhD Docs\ALM 2P\Results\MVAR"
+#mvar_output_root = r"C:\Users\matth\Documents\PhD Docs\ALM 2P\Results\MVAR"
 
 # Directory which contains raw data
-data_root = r"C:\Users\matth\Documents\PhD Docs\ALM 2P\Data\Controls"
+#data_root = r"C:\Users\matth\Documents\PhD Docs\ALM 2P\Data\Controls"
 
 control_session_list = [
     r"65.2a\2024_08_05_Switching",
@@ -58,4 +58,16 @@ control_session_list = [
 ]
 
 
-recurrent_amplification_pipeline(data_root, mvar_output_root, control_session_list)
+data_root = r"C:\Users\matth\Documents\PhD Docs\ALM 2P\Data\Homs"
+mvar_output_root = r"C:\Users\matth\Documents\PhD Docs\ALM 2P\Results\MVAR\Homs"
+
+session_list = [
+    r"64.1B\2024_09_09_Switching",
+    r"70.1A\2024_09_19_Switching",
+    r"70.1B\2024_09_12_Switching",
+    r"72.1E\2024_08_23_Switching",
+]
+
+
+
+recurrent_amplification_pipeline(data_root, mvar_output_root, session_list)

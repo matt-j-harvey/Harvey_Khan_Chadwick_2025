@@ -11,78 +11,110 @@ import matplotlib.pyplot as plt
 import pickle
 import sys
 from tqdm import tqdm
+from sklearn.linear_model import Ridge, LinearRegression
+
+from Widefield_Utils import widefield_utils
 
 import Session_List
 import GLM_Utils
+import Create_Behavioural_Regressor_Matrix
+import Extract_Onsets
+import Create_Regression_Matricies
 
-
-"""
-from Widefield_Utils import widefield_utils
-
-
-import Ridge_Regression_Model_General
-import Create_Full_Model_Design_Matrix
 import Visualise_Regression_Results
-import View_Group_Average_Results
-import Test_Result_Significance
-
-sys.path.append(r"/home/matthew/Documents/Github_Code_Clean/Thesis_Code/Utils")
-import Create_Data_Tensors
-"""
+import Test_Significance_GLM
 
 
+def forceAspect(ax,aspect=1):
+    im = ax.get_images()
+    extent =  im[0].get_extent()
+    ax.set_aspect(abs((extent[1]-extent[0])/(extent[3]-extent[2]))/aspect)
 
-def create_delta_f_matrix(tensor_directory, session, onset_file_list):
+def sanity_check_coefs(model_coefs, start_window, stop_window):
 
-    delta_f_matrix = []
-    for condition in onset_file_list:
+    n_timepoints = stop_window - start_window
+    vis_context_vis_1 = model_coefs[:, 0:n_timepoints]
 
-        # Get Tensor Name
-        tensor_name = condition.replace("_onsets.npy", "")
-        tensor_name = tensor_name.replace("_onset_frames.npy", "")
+    indicies, image_height, image_width = widefield_utils.load_tight_mask()
 
-        # Open Trial Tensor
-        session_trial_tensor_dict_path = os.path.join(tensor_directory, session, tensor_name)
-        with open(session_trial_tensor_dict_path + ".pickle", 'rb') as handle:
-            session_trial_tensor_dict = pickle.load(handle)
-            activity_tensor = session_trial_tensor_dict["activity_tensor"]
-            activity_tensor = widefield_utils.flatten_tensor(activity_tensor)
-
-        # Add To List
-        delta_f_matrix.append(activity_tensor)
-
-    delta_f_matrix = np.vstack(delta_f_matrix)
-
-    return delta_f_matrix
+    for timepoint_index in range(n_timepoints):
+        image = vis_context_vis_1[:, timepoint_index]
+        image = widefield_utils.create_image_from_data(image, indicies, image_height, image_width)
+        plt.imshow(image, vmin=-2, vmax=2, cmap="bwr")
+        plt.title("Sanity Check Coefs" + str(timepoint_index))
+        plt.show()
 
 
 
-def run_full_model_pipeline(data_directory, session, glm_output_directory, context_list = ["visual", "odour"]):
+def run_regression(session, glm_output_directory, design_matrix, delta_f_matrix):
 
-    # Create Behaviour Matrix
-    Create_Behaviour_Matrix.create_behaviour_matrix(data_directory, session, glm_output_directory)
+    # Run Regression
+    model = Ridge(alpha=2, fit_intercept=False)
+    #model = LinearRegression(fit_intercept=False)
+    model.fit(X=design_matrix, y=delta_f_matrix)
 
-    # Create Activity Tensors
-    GLM_Utils.create_activity_tensor(data_directory, session, glm_output_directory, "visual_context_stable_vis_1_onsets.npy", start_window, stop_window)
-    GLM_Utils.create_activity_tensor(data_directory, session, glm_output_directory, "visual_context_stable_vis_2_onsets.npy", start_window, stop_window)
-    GLM_Utils.create_activity_tensor(data_directory, session, glm_output_directory, "odour_context_stable_vis_1_onsets.npy", start_window, stop_window)
-    GLM_Utils.create_activity_tensor(data_directory, session, glm_output_directory, "odour_context_stable_vis_2_onsets.npy", start_window, stop_window)
+    # Extract Coefs
+    model_coefs = model.coef_
+    print("Model Coefs", np.shape(model_coefs))
 
-    # Create Behaviour Tensors
-    GLM_Utils.create_behaviour_tensor(data_directory, session, glm_output_directory, "visual_context_stable_vis_1_onsets.npy", start_window, stop_window)
-    GLM_Utils.create_behaviour_tensor(data_directory, session, glm_output_directory, "visual_context_stable_vis_2_onsets.npy", start_window, stop_window)
-    GLM_Utils.create_behaviour_tensor(data_directory, session, glm_output_directory, "odour_context_stable_vis_1_onsets.npy", start_window, stop_window)
-    GLM_Utils.create_behaviour_tensor(data_directory, session, glm_output_directory, "odour_context_stable_vis_2_onsets.npy", start_window, stop_window)
+    #sanity_check_coefs(model_coefs, start_window, stop_window)
 
-    # Iterate through each context
-    for context in context_list:
+    # Save Coefs
+    save_directory = os.path.join(glm_output_directory, session, "Model_Output")
+    if not os.path.exists(save_directory):
+        os.makedirs(save_directory)
 
+    np.save(os.path.join(save_directory, "Model_Coefs.npy"), model_coefs)
+
+
+
+
+
+
+def run_glm_pipeline(data_directory, session_list, glm_output_directory, start_window, stop_window, context_list = ["visual", "odour"]):
+
+
+    for session in tqdm(session_list):
+        print(session)
+
+        # Create Behaviour Matrix
+        Create_Behavioural_Regressor_Matrix.create_behaviour_matrix(data_directory, session, glm_output_directory)
+
+        # Extract Onsets
+        Extract_Onsets.extract_stable_control_onsets(data_directory, session, glm_output_directory)
+
+        # Create Activity Tensors
+        GLM_Utils.create_activity_tensor(data_directory, session, glm_output_directory, "visual_context_stable_vis_1_control_onsets.npy", start_window, stop_window)
+        GLM_Utils.create_activity_tensor(data_directory, session, glm_output_directory, "visual_context_stable_vis_2_control_onsets.npy", start_window, stop_window)
+        GLM_Utils.create_activity_tensor(data_directory, session, glm_output_directory, "odour_context_stable_vis_1_control_onsets.npy", start_window, stop_window)
+        GLM_Utils.create_activity_tensor(data_directory, session, glm_output_directory, "odour_context_stable_vis_2_control_onsets.npy", start_window, stop_window)
+        GLM_Utils.create_activity_tensor(data_directory, session, glm_output_directory, "odour_1_control_onsets.npy", start_window, stop_window)
+        GLM_Utils.create_activity_tensor(data_directory, session, glm_output_directory, "odour_2_control_onsets.npy", start_window, stop_window)
+
+        # Create Behaviour Tensors
+        GLM_Utils.create_behaviour_tensor(data_directory, session, glm_output_directory, "visual_context_stable_vis_1_control_onsets.npy", start_window, stop_window)
+        GLM_Utils.create_behaviour_tensor(data_directory, session, glm_output_directory, "visual_context_stable_vis_2_control_onsets.npy", start_window, stop_window)
+        GLM_Utils.create_behaviour_tensor(data_directory, session, glm_output_directory, "odour_context_stable_vis_1_control_onsets.npy", start_window, stop_window)
+        GLM_Utils.create_behaviour_tensor(data_directory, session, glm_output_directory, "odour_context_stable_vis_2_control_onsets.npy", start_window, stop_window)
+        GLM_Utils.create_behaviour_tensor(data_directory, session, glm_output_directory, "odour_1_control_onsets.npy", start_window, stop_window)
+        GLM_Utils.create_behaviour_tensor(data_directory, session, glm_output_directory, "odour_2_control_onsets.npy", start_window, stop_window)
+
+        """
         # Create Regression Matricies
-        design_matrix, delta_f_matrix = Create_Regression_Matricies.create_regression_matricies(session, mvar_directory_root, context)
+        design_matrix, delta_f_matrix = Create_Regression_Matricies.create_regression_matricies(data_directory, session, glm_output_directory, z_score=True,  baseline_correct=True)
+
+        print("Design Matrix", np.shape(design_matrix))
+        print("Delta F Matrix", np.shape(delta_f_matrix))
+
+        """
+        #plt.imshow(np.transpose(design_matrix))
+        #forceAspect(plt.gca())
+        #plt.show()
+        """
 
         # Run Regression
-        save_directory = os.path.join(glm_output_directory, session, context)
-        Ridge_Regression_Model_General.fit_ridge_model(delta_f_matrix, design_matrix, save_directory)
+        run_regression(session, glm_output_directory, design_matrix, delta_f_matrix)
+        """
 
     """
     # Visualise Results
@@ -121,14 +153,31 @@ def run_full_model_pipeline(data_directory, session, glm_output_directory, conte
 # To 2 Seconds Post
 
 frame_period = 36
-start_window_ms = -2800
-stop_window_ms = 2000
+start_window_ms = -1500 #-2800
+stop_window_ms = 2500
 start_window = int(start_window_ms/frame_period)
 stop_window = int(stop_window_ms/frame_period)
 
-# Control Switching
-session_list = Session_List.nested_session_list
-data_root_diretory = r"/media/matthew/Expansion/Control_Data"
-tensor_directory = r"/media/matthew/External_Harddrive_3/Thesis_Analysis/Switching_Analysis/Control_GLM"
-run_full_model_pipeline(selected_session_list, analysis_name, data_root_diretory, tensor_directory, svd_or_nmf='nmf')
 
+# Load Session List
+nested_session_list = Session_List.nested_session_list
+flat_session_list = Session_List.flatten_nested_list(nested_session_list)
+
+data_root_diretory = r"/media/matthew/29D46574463D2856/Harvey_Khan_Data/Widefield_Opto"
+output_directory = r"/media/matthew/29D46574463D2856/Paper_Results/Contextual_Swtiching_GLM_2"
+
+run_glm_pipeline(data_root_diretory, flat_session_list, output_directory, start_window, stop_window)
+
+"""
+
+
+# Get Group Results
+Visualise_Regression_Results.extract_model_results(flat_session_list, output_directory, start_window, stop_window)
+Visualise_Regression_Results.get_group_results(output_directory, nested_session_list)
+Visualise_Regression_Results.view_mean_results(output_directory, start_window, stop_window, frame_period)
+"""
+
+# Test Significance
+condition_1 = "vis_context_vis_2"
+condition_2 = "odr_context_vis_2"
+Test_Significance_GLM.test_signficance(nested_session_list, output_directory, condition_1, condition_2, start_window, stop_window)

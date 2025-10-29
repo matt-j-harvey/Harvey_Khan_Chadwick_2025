@@ -68,7 +68,7 @@ def model_comparison_pipeline(mvar_output_root, session_list):
     for session in session_list:
 
         # Get Diagonal With Stim R2
-        Fit_Diagonal_with_Stimuli.fit_diagonal_with_stimuli(mvar_output_root, session)
+        #Fit_Diagonal_with_Stimuli.fit_diagonal_with_stimuli(mvar_output_root, session)
 
         # Get Response + Behaviour
         response_behaviour_scores = np.load(os.path.join(mvar_output_root, session, "Ridge_Penalty_Search", "No_Recurrent", "Ridge_Penalty_Search_Results.npy"))
@@ -118,10 +118,10 @@ Different model types:
 
 
 # Output directory where you want the data to be saved to
-mvar_output_root = r"C:\Users\matth\Documents\PhD Docs\ALM 2P\Results\MVAR"
+#mvar_output_root = r"C:\Users\matth\Documents\PhD Docs\ALM 2P\Results\MVAR"
 
 # Directory which contains raw data
-data_root = r"C:\Users\matth\Documents\PhD Docs\ALM 2P\Data\Controls"
+#data_root = r"C:\Users\matth\Documents\PhD Docs\ALM 2P\Data\Controls"
 
 control_session_list = [
     r"65.2a\2024_08_05_Switching",
@@ -133,11 +133,24 @@ control_session_list = [
 ]
 
 
+
+
+data_root = r"C:\Users\matth\Documents\PhD Docs\ALM 2P\Data\Homs"
+mvar_output_root = r"C:\Users\matth\Documents\PhD Docs\ALM 2P\Results\MVAR\Homs"
+
+session_list = [
+    r"64.1B\2024_09_09_Switching",
+    r"70.1A\2024_09_19_Switching",
+    r"70.1B\2024_09_12_Switching",
+    r"72.1E\2024_08_23_Switching",
+]
+
+
 # Model Info
 start_window = -17
 stop_window = 12
 
 
 # Control Switching
-model_comparison_pipeline(mvar_output_root, control_session_list)
+model_comparison_pipeline(mvar_output_root, session_list)
 

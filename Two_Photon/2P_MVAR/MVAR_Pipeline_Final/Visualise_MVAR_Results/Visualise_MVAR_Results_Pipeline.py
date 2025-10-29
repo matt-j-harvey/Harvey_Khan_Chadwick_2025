@@ -113,10 +113,10 @@ def visualise_mvar_results_session(data_root_directory, mvar_directory, session_
 
 
 # Output directory where you want the data to be saved to
-mvar_output_root = r"C:\Users\matth\Documents\PhD Docs\ALM 2P\Results\MVAR"
+#mvar_output_root = r"C:\Users\matth\Documents\PhD Docs\ALM 2P\Results\MVAR"
 
 # Directory which contains raw data
-data_root = r"C:\Users\matth\Documents\PhD Docs\ALM 2P\Data\Controls"
+#data_root = r"C:\Users\matth\Documents\PhD Docs\ALM 2P\Data\Controls"
 
 control_session_list = [
     r"65.2a\2024_08_05_Switching",
@@ -127,7 +127,22 @@ control_session_list = [
     r"72.3C\2024_09_10_Switching",
 ]
 
-visualise_mvar_results_session(data_root, mvar_output_root, control_session_list, "Standard")
+
+
+
+data_root = r"C:\Users\matth\Documents\PhD Docs\ALM 2P\Data\Homs"
+mvar_output_root = r"C:\Users\matth\Documents\PhD Docs\ALM 2P\Results\MVAR\Homs"
+
+session_list = [
+    r"64.1B\2024_09_09_Switching",
+    r"70.1A\2024_09_09_Switching",
+    r"70.1B\2024_09_12_Switching",
+    r"72.1E\2024_08_23_Switching",
+]
+
+
+
+visualise_mvar_results_session(data_root, mvar_output_root, session_list, "Standard")
 
 
 

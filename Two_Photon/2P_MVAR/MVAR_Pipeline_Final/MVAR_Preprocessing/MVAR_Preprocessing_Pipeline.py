@@ -31,6 +31,7 @@ def preprocess_session(data_root_directory, session, mvar_output_directory, star
 
     # Extract Onsets
     Extract_Onsets.extract_lick_onsets(data_root_directory, session, mvar_output_root)
+    Extract_Onsets.extract_odour_onsets(os.path.join(data_root_directory, session))
 
     # Create Behaviour Matrix
     Create_Behaviour_Matrix.create_behaviour_matrix(data_root_directory, session, mvar_output_directory)
@@ -54,10 +55,10 @@ def preprocess_session(data_root_directory, session, mvar_output_directory, star
 
 
 # Output directory where you want the data to be saved to
-mvar_output_root = r"C:\Users\matth\Documents\PhD Docs\ALM 2P\Results\MVAR"
+#mvar_output_root = r"C:\Users\matth\Documents\PhD Docs\ALM 2P\Results\MVAR"
 
 # Directory which contains raw data
-data_root = r"C:\Users\matth\Documents\PhD Docs\ALM 2P\Data\Controls"
+#data_root = r"C:\Users\matth\Documents\PhD Docs\ALM 2P\Data\Controls"
 
 # List of Sessions to Process
 control_session_list = [
@@ -69,11 +70,24 @@ control_session_list = [
     r"72.3C\2024_09_10_Switching",
 ]
 
+
+data_root = r"C:\Users\matth\Documents\PhD Docs\ALM 2P\Data\Homs"
+mvar_output_root = r"C:\Users\matth\Documents\PhD Docs\ALM 2P\Results\MVAR\Homs"
+
+session_list = [
+    #r"64.1B\2024_09_09_Switching",
+    r"70.1A\2024_09_19_Switching",
+    #r"70.1B\2024_09_12_Switching",
+    #r"72.1E\2024_08_23_Switching",
+]
+
+
+
 # Model Info
 start_window = -17 # How many timepoints before the onset of each stimulus to include
 stop_window = 12 # How many timepoints after the onset of each stimulus to include
 
 # Control Switching
-for session in tqdm(control_session_list, desc="Session"):
+for session in tqdm(session_list, desc="Session"):
     preprocess_session(data_root, session, mvar_output_root, start_window, stop_window)
 

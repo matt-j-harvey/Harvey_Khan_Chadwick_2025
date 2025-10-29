@@ -69,11 +69,11 @@ def extract_lick_onsets(data_root_directory, session, mvar_output_directory):
     preceeding_window = int(np.ceil(1.5 * frame_rate))
     lick_onsets = get_onsets(downsampled_lick_trace, lick_threshold, preceeding_window=preceeding_window)
 
-    """
+
     plt.plot(downsampled_lick_trace)
     plt.scatter(lick_onsets, np.multiply(np.ones(len(lick_onsets)), lick_threshold), c='k')
     plt.show()
-    """
+
 
     # Save Onset Frames
     np.save(os.path.join(mvar_output_directory, session, "Behaviour", "Lick_Onset_Frames.npy"), lick_onsets)

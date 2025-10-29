@@ -19,6 +19,7 @@ def create_lagged_matrix(lick_onsets, n_timepoints, n_lags):
     # Create Empty Regressor
     lagged_regressor = np.zeros((n_timepoints, n_lags+1))
     print("lagged regressor", np.shape(lagged_regressor))
+    print("n timepoints", n_timepoints)
 
     # Populate With Lags
     for onset in lick_onsets:
@@ -26,7 +27,7 @@ def create_lagged_matrix(lick_onsets, n_timepoints, n_lags):
         # Add Following Regressor
         for lag_index in range(n_lags+1):
             timepoint = onset + lag_index
-            if timepoint <= n_timepoints:
+            if timepoint < n_timepoints:
                 lagged_regressor[timepoint, lag_index] = 1
 
     """
