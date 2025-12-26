@@ -42,9 +42,10 @@ def plot_error_matrix(save_directory, model_type, error_matrix, number_of_penalt
     plt.colorbar(im, ax=colourbar_axis, fraction=0.05, location='left')
     plt.tight_layout()
 
-    #plt.show()
     plt.savefig(os.path.join(save_directory, model_type + "_Parameter_Sweep.png"))
+    plt.show()
     plt.close()
+
 
 
 

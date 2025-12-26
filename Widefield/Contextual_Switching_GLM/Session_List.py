@@ -115,7 +115,8 @@ nested_session_list_with_root = [
 
 nested_session_list = [
 
-    ["KPGC11.1C/2024_08_22_Switching_V1_Pre_03",
+    [
+    #"KPGC11.1C/2024_08_22_Switching_V1_Pre_03",
      "KPGC11.1C/2024_08_23_Switching_PPC_Pre_03",
      "KPGC11.1C/2024_08_26_Switching_ProxM_Pre_03",
      "KPGC11.1C/2024_08_28_Switching_PM_Pre_03",
@@ -152,7 +153,7 @@ nested_session_list = [
      "KPGC12.3B/2024_09_12_Switching_SS_Pre_03",
      "KPGC12.3B/2024_09_16_Switching_ALM_Pre_03",
      "KPGC12.3B/2024_09_17_Switching_PM_Pre_03",
-     "KPGC12.3B/2024_09_18_Switching_V1_Pre_03",
+     #"KPGC12.3B/2024_09_18_Switching_V1_Pre_03",
      "KPGC12.3B/2024_09_19_Switching_Pre_03",
      "KPGC12.3B/2024_09_20_Switching_MM_Pre_03",
      "KPGC12.3B/2024_09_23_Switching_SS_Pre_03",
@@ -199,7 +200,7 @@ nested_session_list = [
      "KPGC3.3E/2023_07_31_Switch_ALM_1F_04_Pre",
      "KPGC3.3E/2023_08_02_Switch_PM_1f_04_Pre",
      "KPGC3.3E/2023_08_07_Switch_SS_1F_04_1S_Pre",
-     "KPGC3.3E/2023_08_09_Switch_PPC_1F_04_1S_Pre",
+     #"KPGC3.3E/2023_08_09_Switch_PPC_1F_04_1S_Pre", # - Facecam too short
      "KPGC3.3E/2023_08_18_Switch_BC_1F_04_1S_Pre",
      "KPGC3.3E/2023_08_21_Switch_V1_1F_04_1S_Pre"],
 

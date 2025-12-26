@@ -1,8 +1,10 @@
 import os
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib.colors import LinearSegmentedColormap
 from scipy import stats
 import pickle
+
 
 
 def forceAspect(ax,aspect=1):
@@ -79,9 +81,7 @@ def create_image_from_data(data, indicies, image_height, image_width):
 def create_activity_tensor(data_root_directory, session, mvar_output_directory, onsets_file, start_window, stop_window):
 
     # Load Activity Matrix
-    #activity_matrix = np.load(os.path.join(data_root_directory, session, "Preprocessed_Data", "Corrected_SVT.npy"))
-    activity_matrix = np.load(os.path.join(mvar_output_directory, session, "Local_NMF", "Temporal_Components.npy"))
-
+    activity_matrix = np.load(os.path.join(data_root_directory, session, "Local_NMF", "Temporal_Components.npy"))
     activity_matrix = np.transpose(activity_matrix)
     number_of_timepoints, number_of_components = np.shape(activity_matrix)
 
@@ -152,3 +152,36 @@ def create_behaviour_tensor(data_root_directory, session, mvar_output_directory,
 
     with open(tensor_file + ".pickle", 'wb') as handle:
         pickle.dump(trial_tensor_dictionary, handle, protocol=4)
+
+
+
+
+def load_tight_mask():
+    tight_mask_file = r"C:\Users\matth\Dropbox\Harvey_Khan_Chadwick_2025\Code_Resource_Files\Tight_Mask_Dict.npy"
+    tight_mask_dict = np.load(tight_mask_file, allow_pickle=True)[()]
+    indicies = tight_mask_dict["indicies"]
+    image_height = tight_mask_dict["image_height"]
+    image_width = tight_mask_dict["image_width"]
+    return indicies, image_height, image_width
+
+
+def create_image_from_data(data, indicies, image_height, image_width):
+    template = np.zeros((image_height, image_width))
+    data = np.nan_to_num(data)
+    np.put(template, indicies, data)
+    image = np.ndarray.reshape(template, (image_height, image_width))
+    return image
+
+
+def get_musall_cmap():
+    cmap = LinearSegmentedColormap.from_list('mycmap', [
+
+        (0, 0.87, 0.9, 1),
+        (0, 0, 1, 1),
+        (0, 0, 0, 1),
+        (1, 0, 0, 1),
+        (1, 1, 0, 1),
+
+    ])
+
+    return cmap

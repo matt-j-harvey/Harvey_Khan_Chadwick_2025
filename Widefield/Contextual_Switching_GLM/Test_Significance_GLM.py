@@ -5,10 +5,11 @@ from scipy import stats
 from tqdm import tqdm
 from statsmodels.stats.multitest import fdrcorrection
 
-from Widefield_Utils import widefield_utils
+import GLM_Utils
 
 
-def test_signficance(nested_session_list, glm_output_directory, condition_1, condition_2, start_window, stop_window):
+
+def test_significance(nested_session_list, glm_output_directory, condition_1, condition_2, start_window, stop_window):
 
 
     group_condition_1_list = []
@@ -38,8 +39,8 @@ def test_signficance(nested_session_list, glm_output_directory, condition_1, con
     t_stats, p_values = stats.ttest_rel(group_condition_1_list, group_condition_2_list, axis=0)
 
 
-    colourmap = widefield_utils.get_musall_cmap()
-    indicies, image_height, image_width = widefield_utils.load_tight_mask()
+    colourmap = GLM_Utils.get_musall_cmap()
+    indicies, image_height, image_width = GLM_Utils.load_tight_mask()
 
     x_values = list(range(start_window, stop_window))
     x_values = np.multiply(x_values, 36)
@@ -88,7 +89,7 @@ def test_signficance(nested_session_list, glm_output_directory, condition_1, con
     thresholded_diff = np.where(rejected==True, mean_diff, 0)
     #thresholded_diff = mean_diff
 
-    image = widefield_utils.create_image_from_data(thresholded_diff, indicies, image_height, image_width)
+    image = GLM_Utils.create_image_from_data(thresholded_diff, indicies, image_height, image_width)
 
     plt.imshow(image, cmap=colourmap, vmin=-0.2, vmax=0.2)
     plt.title("Window Average")

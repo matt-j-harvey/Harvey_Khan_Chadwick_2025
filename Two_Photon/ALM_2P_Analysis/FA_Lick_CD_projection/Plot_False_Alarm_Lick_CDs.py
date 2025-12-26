@@ -99,12 +99,15 @@ def plot_false_alarm_lick_cd(data_directory_root, session_list, output_directory
     axis_1.spines[['right', 'top']].set_visible(False)
     axis_1.set_xlabel("Time (s)")
     axis_1.set_ylabel("Lick CD Projection")
+    axis_1.set_ylim([-3, 13])
 
 
 
     plt.show()
 
-session_list = [
+
+control_data_directory = r"C:\Users\matth\Documents\PhD Docs\ALM 2P\Data\Controls"
+control_session_list = [
     r"65.2a\2024_08_05_Switching",
     r"65.2b\2024_07_31_Switching",
     r"67.3b\2024_08_09_Switching",
@@ -114,6 +117,16 @@ session_list = [
 ]
 
 
-data_directory = r"C:\Users\matth\Documents\PhD Docs\ALM 2P\Data\Controls"
 
-plot_false_alarm_lick_cd(data_directory, session_list, None)
+
+hom_data_directory = r"C:\Users\matth\Documents\PhD Docs\ALM 2P\Data\Homs"
+hom_session_list = [
+    r"64.1B\2024_09_09_Switching",
+    r"70.1A\2024_09_09_Switching",
+    r"70.1B\2024_09_12_Switching",
+    r"72.1E\2024_08_23_Switching",
+]
+
+
+plot_false_alarm_lick_cd(hom_data_directory, hom_session_list, None)
+plot_false_alarm_lick_cd(control_data_directory, control_session_list, None)

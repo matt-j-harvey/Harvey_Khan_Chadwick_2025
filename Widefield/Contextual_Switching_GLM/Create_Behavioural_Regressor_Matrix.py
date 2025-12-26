@@ -158,7 +158,7 @@ def create_behaviour_matrix(data_root_directory, base_directory, mvar_output_dir
     # Load Downsampled AI
     downsampled_ai_file = os.path.join(data_root_directory, base_directory, "Downsampled_AI_Matrix_Framewise.npy")
     downsampled_ai_matrix = np.load(downsampled_ai_file)
-
+    print("downsampled_ai_matrix", np.shape(downsampled_ai_matrix))
     # Create Stimuli Dictionary
     stimuli_dictionary = GLM_Utils.create_stimuli_dictionary()
 
@@ -175,23 +175,26 @@ def create_behaviour_matrix(data_root_directory, base_directory, mvar_output_dir
 
     # Get Lagged Lick Regressor
     n_lags = int(np.around(1500/36, 0))
-    #print("n_lags", n_lags)
-
     lick_threshold = np.load(os.path.join(data_root_directory, base_directory, "Lick_Threshold.npy"))
-
-    #visualise_lick_threshold(lick_trace, lick_threshold)
-
-
     lick_regressors = create_lagged_matrix(lick_trace, lick_threshold, n_lags=n_lags)
+
+    # Load Mousecam Components
+    face_motion_svd = np.load(os.path.join(data_root_directory, base_directory, "Mousecam_Analysis", "Face_Motion_SVD.npy"))
+    #face_motion_svd = np.random.uniform(low=-1, high=1, size=np.shape(face_motion_svd))
+    print("face_motion_svd", np.shape(face_motion_svd))
+    print("running_trace", np.shape(running_trace))
+    print("lick_regressors", np.shape(lick_regressors))
 
     #print("Running Trace", np.shape(running_trace))
     # Create Design Matrix
     design_matrix = [
         running_trace,
         lick_regressors,
+        face_motion_svd
     ]
 
     design_matrix = np.hstack(design_matrix)
+    print("design_matrix", np.shape(design_matrix))
 
     # Save These
     save_directory = os.path.join(mvar_output_directory, base_directory, "Behaviour")

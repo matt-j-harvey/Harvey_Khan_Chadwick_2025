@@ -14,7 +14,7 @@ import pickle
 import matplotlib.pyplot as plt
 
 import GLM_Utils
-from Widefield_Utils import widefield_utils
+
 
 
 
@@ -82,24 +82,25 @@ def reconstruct_df_into_pixel_space(data_directory_root, session, glm_output_roo
 def reconstruct_tensor_into_pixel_space(data_directory_root, session, tensor):
 
     # Load Registered SVD
-    reg_u = np.load(os.path.join(data_directory_root, session, "Preprocessed_Data", "Registered_U.npy"))
+    #reg_u = np.load(os.path.join(data_directory_root, session, "Preprocessed_Data", "Registered_U.npy"))
+    spatial_components = np.load(os.path.join(data_directory_root, session, "Local_NMF", "Spatial_Components.npy"))
 
     # Flatten Reg U
-    image_height, image_width, n_components = np.shape(reg_u)
-    reg_u = np.reshape(reg_u, (image_height * image_width, n_components))
+    image_height, image_width, n_components = np.shape(spatial_components)
+    spatial_components = np.reshape(spatial_components, (image_height * image_width, n_components))
 
     # load mask
-    indicies, image_height, image_width = widefield_utils.load_tight_mask()
+    indicies, image_height, image_width = GLM_Utils.load_tight_mask()
 
     # Mask Reg U
-    reg_u = reg_u[indicies]
+    spatial_components = spatial_components[indicies]
 
     # Flatten Tensor
     n_trials, n_timepoints, n_components = np.shape(tensor)
     tensor = np.reshape(tensor, (n_trials * n_timepoints, n_components))
 
-    # Recosntruct
-    tensor = np.dot(tensor, reg_u.T)
+    # Reconstruct
+    tensor = np.dot(tensor, spatial_components.T)
 
     # Reshape back Into Tensor
     n_pixels = np.shape(indicies)[1]
@@ -111,15 +112,15 @@ def reconstruct_tensor_into_pixel_space(data_directory_root, session, tensor):
 def view_mean_tensor(tensor):
 
     # load mask
-    indicies, image_height, image_width = widefield_utils.load_tight_mask()
+    indicies, image_height, image_width = GLM_Utils.load_tight_mask()
 
     mean_tensor = np.mean(tensor, axis=0)
 
     count = 0
     for timepoint in mean_tensor:
         plt.title(str(count))
-        reconstruction = widefield_utils.create_image_from_data(timepoint, indicies, image_height, image_width)
-        plt.imshow(reconstruction, cmap=widefield_utils.get_musall_cmap(), vmin=-0.5, vmax=0.5)
+        reconstruction = GLM_Utils.create_image_from_data(timepoint, indicies, image_height, image_width)
+        plt.imshow(reconstruction, cmap=GLM_Utils.get_musall_cmap(), vmin=-0.5, vmax=0.5)
         plt.show()
 
         count +=1
@@ -191,11 +192,11 @@ def create_regression_matricies(data_directory, session, mvar_directory_root, z_
     print("visual_context_vis_1_activity_tensor", np.shape(visual_context_vis_1_activity_tensor))
 
     # Reconstruct Tensors Into Pixel Space
-    visual_context_vis_1_activity_tensor = reconstruct_tensor_into_pixel_space(data_directory, session, visual_context_vis_1_activity_tensor)
-    visual_context_vis_2_activity_tensor = reconstruct_tensor_into_pixel_space(data_directory, session, visual_context_vis_2_activity_tensor)
-    odour_context_vis_1_activity_tensor = reconstruct_tensor_into_pixel_space(data_directory, session, odour_context_vis_1_activity_tensor)
-    odour_context_vis_2_activity_tensor = reconstruct_tensor_into_pixel_space(data_directory, session, odour_context_vis_2_activity_tensor)
-    print("visual_context_vis_1_activity_tensor", np.shape(visual_context_vis_1_activity_tensor))
+    #visual_context_vis_1_activity_tensor = reconstruct_tensor_into_pixel_space(data_directory, session, visual_context_vis_1_activity_tensor)
+    #visual_context_vis_2_activity_tensor = reconstruct_tensor_into_pixel_space(data_directory, session, visual_context_vis_2_activity_tensor)
+    #odour_context_vis_1_activity_tensor = reconstruct_tensor_into_pixel_space(data_directory, session, odour_context_vis_1_activity_tensor)
+    #odour_context_vis_2_activity_tensor = reconstruct_tensor_into_pixel_space(data_directory, session, odour_context_vis_2_activity_tensor)
+    #print("visual_context_vis_1_activity_tensor", np.shape(visual_context_vis_1_activity_tensor))
 
     # Z Score If Required
     if z_score == True:

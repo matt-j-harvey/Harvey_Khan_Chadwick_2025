@@ -13,13 +13,14 @@ import sys
 from tqdm import tqdm
 from sklearn.linear_model import Ridge, LinearRegression
 
-from Widefield_Utils import widefield_utils
+
 
 import Session_List
 import GLM_Utils
 import Create_Behavioural_Regressor_Matrix
 import Extract_Onsets
 import Create_Regression_Matricies
+import Parameter_Search
 
 import Visualise_Regression_Results
 import Test_Significance_GLM
@@ -73,64 +74,63 @@ def run_regression(session, glm_output_directory, design_matrix, delta_f_matrix)
 
 def run_glm_pipeline(data_directory, session_list, glm_output_directory, start_window, stop_window, context_list = ["visual", "odour"]):
 
+    for mouse in tqdm(session_list, desc="Mouse"):
+        for session in tqdm(mouse, desc="Session"):
+            print(session)
 
-    for session in tqdm(session_list):
-        print(session)
+            # Create Behaviour Matrix
+            Create_Behavioural_Regressor_Matrix.create_behaviour_matrix(data_directory, session, glm_output_directory)
 
-        # Create Behaviour Matrix
-        Create_Behavioural_Regressor_Matrix.create_behaviour_matrix(data_directory, session, glm_output_directory)
+            # Extract Onsets
+            Extract_Onsets.extract_stable_control_onsets(data_directory, session, glm_output_directory)
 
-        # Extract Onsets
-        Extract_Onsets.extract_stable_control_onsets(data_directory, session, glm_output_directory)
+            # Create Activity Tensors
+            GLM_Utils.create_activity_tensor(data_directory, session, glm_output_directory, "visual_context_stable_vis_1_control_onsets.npy", start_window, stop_window)
+            GLM_Utils.create_activity_tensor(data_directory, session, glm_output_directory, "visual_context_stable_vis_2_control_onsets.npy", start_window, stop_window)
+            GLM_Utils.create_activity_tensor(data_directory, session, glm_output_directory, "odour_context_stable_vis_1_control_onsets.npy", start_window, stop_window)
+            GLM_Utils.create_activity_tensor(data_directory, session, glm_output_directory, "odour_context_stable_vis_2_control_onsets.npy", start_window, stop_window)
+            GLM_Utils.create_activity_tensor(data_directory, session, glm_output_directory, "odour_1_control_onsets.npy", start_window, stop_window)
+            GLM_Utils.create_activity_tensor(data_directory, session, glm_output_directory, "odour_2_control_onsets.npy", start_window, stop_window)
 
-        # Create Activity Tensors
-        GLM_Utils.create_activity_tensor(data_directory, session, glm_output_directory, "visual_context_stable_vis_1_control_onsets.npy", start_window, stop_window)
-        GLM_Utils.create_activity_tensor(data_directory, session, glm_output_directory, "visual_context_stable_vis_2_control_onsets.npy", start_window, stop_window)
-        GLM_Utils.create_activity_tensor(data_directory, session, glm_output_directory, "odour_context_stable_vis_1_control_onsets.npy", start_window, stop_window)
-        GLM_Utils.create_activity_tensor(data_directory, session, glm_output_directory, "odour_context_stable_vis_2_control_onsets.npy", start_window, stop_window)
-        GLM_Utils.create_activity_tensor(data_directory, session, glm_output_directory, "odour_1_control_onsets.npy", start_window, stop_window)
-        GLM_Utils.create_activity_tensor(data_directory, session, glm_output_directory, "odour_2_control_onsets.npy", start_window, stop_window)
+            # Create Behaviour Tensors
+            GLM_Utils.create_behaviour_tensor(data_directory, session, glm_output_directory, "visual_context_stable_vis_1_control_onsets.npy", start_window, stop_window)
+            GLM_Utils.create_behaviour_tensor(data_directory, session, glm_output_directory, "visual_context_stable_vis_2_control_onsets.npy", start_window, stop_window)
+            GLM_Utils.create_behaviour_tensor(data_directory, session, glm_output_directory, "odour_context_stable_vis_1_control_onsets.npy", start_window, stop_window)
+            GLM_Utils.create_behaviour_tensor(data_directory, session, glm_output_directory, "odour_context_stable_vis_2_control_onsets.npy", start_window, stop_window)
+            GLM_Utils.create_behaviour_tensor(data_directory, session, glm_output_directory, "odour_1_control_onsets.npy", start_window, stop_window)
+            GLM_Utils.create_behaviour_tensor(data_directory, session, glm_output_directory, "odour_2_control_onsets.npy", start_window, stop_window)
 
-        # Create Behaviour Tensors
-        GLM_Utils.create_behaviour_tensor(data_directory, session, glm_output_directory, "visual_context_stable_vis_1_control_onsets.npy", start_window, stop_window)
-        GLM_Utils.create_behaviour_tensor(data_directory, session, glm_output_directory, "visual_context_stable_vis_2_control_onsets.npy", start_window, stop_window)
-        GLM_Utils.create_behaviour_tensor(data_directory, session, glm_output_directory, "odour_context_stable_vis_1_control_onsets.npy", start_window, stop_window)
-        GLM_Utils.create_behaviour_tensor(data_directory, session, glm_output_directory, "odour_context_stable_vis_2_control_onsets.npy", start_window, stop_window)
-        GLM_Utils.create_behaviour_tensor(data_directory, session, glm_output_directory, "odour_1_control_onsets.npy", start_window, stop_window)
-        GLM_Utils.create_behaviour_tensor(data_directory, session, glm_output_directory, "odour_2_control_onsets.npy", start_window, stop_window)
+            # Create Regression Matricies
+            design_matrix, delta_f_matrix = Create_Regression_Matricies.create_regression_matricies(data_directory, session, glm_output_directory, z_score=False,  baseline_correct=False)
+            print("Design Matrix", np.shape(design_matrix))
+            print("Delta F Matrix", np.shape(delta_f_matrix))
 
-        """
-        # Create Regression Matricies
-        design_matrix, delta_f_matrix = Create_Regression_Matricies.create_regression_matricies(data_directory, session, glm_output_directory, z_score=True,  baseline_correct=True)
 
-        print("Design Matrix", np.shape(design_matrix))
-        print("Delta F Matrix", np.shape(delta_f_matrix))
+            # Perform Parameter Search
+            Parameter_Search.parameter_search(glm_output_directory, session, design_matrix, delta_f_matrix, max_mousecam_components=500)
 
-        """
-        #plt.imshow(np.transpose(design_matrix))
-        #forceAspect(plt.gca())
-        #plt.show()
-        """
+            # Run Regression
+            #run_regression(session, glm_output_directory, design_matrix, delta_f_matrix)
 
-        # Run Regression
-        run_regression(session, glm_output_directory, design_matrix, delta_f_matrix)
-        """
 
-    """
-    # Visualise Results
-    for mouse in tqdm(selected_session_list, leave=True, position=0, desc="Mouse"):
-      for base_directory in tqdm(mouse, leave=True, position=1, desc="Session"):
-
-          data_directory = os.path.join(data_root_diretory, base_directory)
-          output_directory = os.path.join(tensor_save_directory, base_directory)
-          print("data_directory", data_directory)
-          regression_dictionary = np.load(os.path.join(output_directory, "Regression_Dictionary_Simple.npy"), allow_pickle=True)[()]
-          design_matrix = np.load(os.path.join(output_directory, "Full_Model_Design_Matrix.npy"))
-          design_matrix_key_dict = np.load(os.path.join(output_directory, "design_matrix_key_dict.npy"), allow_pickle=True)[()]
-          delta_f_matrix = np.load(os.path.join(output_directory, "Full_Model_Delta_F_Matrix.npy"))
-
-          Visualise_Regression_Results.visualise_regression_results(data_directory, output_directory, regression_dictionary, design_matrix, design_matrix_key_dict, delta_f_matrix, svd_or_nmf=svd_or_nmf)
     
+        """
+        # Visualise Results
+        for mouse in tqdm(selected_session_list, leave=True, position=0, desc="Mouse"):
+          for base_directory in tqdm(mouse, leave=True, position=1, desc="Session"):
+
+              data_directory = os.path.join(data_root_diretory, base_directory)
+              output_directory = os.path.join(tensor_save_directory, base_directory)
+              print("data_directory", data_directory)
+              regression_dictionary = np.load(os.path.join(output_directory, "Regression_Dictionary_Simple.npy"), allow_pickle=True)[()]
+              design_matrix = np.load(os.path.join(output_directory, "Full_Model_Design_Matrix.npy"))
+              design_matrix_key_dict = np.load(os.path.join(output_directory, "design_matrix_key_dict.npy"), allow_pickle=True)[()]
+              delta_f_matrix = np.load(os.path.join(output_directory, "Full_Model_Delta_F_Matrix.npy"))
+
+              Visualise_Regression_Results.visualise_regression_results(data_directory, output_directory, regression_dictionary, design_matrix, design_matrix_key_dict, delta_f_matrix, svd_or_nmf=svd_or_nmf)
+
+        """
+    """
     # View Group Average Coefs
     View_Group_Average_Results.view_average_coef_group(selected_session_list, tensor_save_directory)
 
@@ -144,40 +144,40 @@ def run_glm_pipeline(data_directory, session_list, glm_output_directory, start_w
     condition_2_coef_name = "odour_context_stable_vis_1"
     Test_Result_Significance.test_signifiance(selected_session_list, tensor_save_directory, condition_1_coef_name, condition_2_coef_name, "Vis_1_Context", 0.05)
     Test_Result_Significance.test_signifiance(selected_session_list, tensor_save_directory, condition_1_coef_name, condition_2_coef_name, "Vis_1_Context", 0.1)
-   """
+    """
 
 
+
+
+# Set Directories
+data_root = r"C:\Users\matth\Dropbox\Harvey_Khan_Chadwick_2025\Widefield_Opto"
+output_root = r"C:\Users\matth\Dropbox\Harvey_Khan_Chadwick_2025\Analysis_Output\Widefield_GLM"
 
 # Select Analysis Details
-# For 2.8 Seconds Pre
-# To 2 Seconds Post
-
 frame_period = 36
-start_window_ms = -1500 #-2800
+start_window_ms = -1500
 stop_window_ms = 2500
 start_window = int(start_window_ms/frame_period)
 stop_window = int(stop_window_ms/frame_period)
 
-
 # Load Session List
-nested_session_list = Session_List.nested_session_list
-flat_session_list = Session_List.flatten_nested_list(nested_session_list)
+session_list = Session_List.nested_session_list
 
-data_root_diretory = r"/media/matthew/29D46574463D2856/Harvey_Khan_Data/Widefield_Opto"
-output_directory = r"/media/matthew/29D46574463D2856/Paper_Results/Contextual_Swtiching_GLM_2"
+# Run Pipeline
+run_glm_pipeline(data_root, session_list[1:], output_root, start_window, stop_window)
 
-run_glm_pipeline(data_root_diretory, flat_session_list, output_directory, start_window, stop_window)
+
+
 
 """
-
-
 # Get Group Results
 Visualise_Regression_Results.extract_model_results(flat_session_list, output_directory, start_window, stop_window)
 Visualise_Regression_Results.get_group_results(output_directory, nested_session_list)
 Visualise_Regression_Results.view_mean_results(output_directory, start_window, stop_window, frame_period)
-"""
+
 
 # Test Significance
 condition_1 = "vis_context_vis_2"
 condition_2 = "odr_context_vis_2"
 Test_Significance_GLM.test_signficance(nested_session_list, output_directory, condition_1, condition_2, start_window, stop_window)
+"""

@@ -27,5 +27,6 @@ def load_df_matrix(data_directory):
     # Get dF/F
     df = np.subtract(f_matrix, f_zero)
     df_matrix = np.divide(df, f_zero)
+    df_matrix = np.nan_to_num(df_matrix)
 
     return df_matrix

@@ -9,13 +9,13 @@ from scipy import ndimage
 
 import Session_List
 import GLM_Utils
-from Widefield_Utils import widefield_utils
+
 
 
 def reconstruct_regressor(regressor, indicies, image_height, image_width):
     reconstructed_regressor = []
     for timepoint in regressor:
-        timepoint_reconstruction = widefield_utils.create_image_from_data(timepoint, indicies, image_height, image_width)
+        timepoint_reconstruction = GLM_Utils.create_image_from_data(timepoint, indicies, image_height, image_width)
         reconstructed_regressor.append(timepoint_reconstruction)
 
     reconstructed_regressor = np.array(reconstructed_regressor)
@@ -29,7 +29,7 @@ def visualise_regressor(regressor, start_window, stop_window):
     count = 0
 
     for value in regressor:
-        plt.imshow(value, cmap=widefield_utils.get_musall_cmap(), vmin=-0.01, vmax=0.01)
+        plt.imshow(value, cmap=GLM_Utils.get_musall_cmap(), vmin=-0.01, vmax=0.01)
         plt.title(x_values[count])
         plt.draw()
         plt.pause(0.1)
@@ -113,16 +113,16 @@ def view_mean_results(output_directory, start_window, stop_window, frame_period)
     regressor_list = ["vis_context_vis_1", "vis_context_vis_2", "odr_context_vis_1", "odr_context_vis_2"]
 
     # Load Mask
-    indicies, image_height, image_width = widefield_utils.load_tight_mask()
+    indicies, image_height, image_width = GLM_Utils.load_tight_mask()
 
     # Get Background Pixels
-    background_pixels = widefield_utils.get_background_pixels(indicies, image_height, image_width)
+    background_pixels = GLM_Utils.get_background_pixels(indicies, image_height, image_width)
 
     # Get Atlas Outline Pixels
     atlas_outline_pixels = get_atlas_outline_pixels()
 
     # Get Colourmap
-    cmap = widefield_utils.get_musall_cmap()
+    cmap = GLM_Utils.get_musall_cmap()
 
     for regressor in regressor_list:
 
