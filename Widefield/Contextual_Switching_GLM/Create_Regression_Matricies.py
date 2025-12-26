@@ -37,7 +37,6 @@ def create_stimuli_regressor(n_trials, n_timepoints):
 
     combined_stimuli_regressors = []
 
-
     for stimulus_index in range(n_stimuli):
 
         stimulus_regressor = np.zeros((n_trials[stimulus_index] * n_timepoints, n_stimuli * n_timepoints))
