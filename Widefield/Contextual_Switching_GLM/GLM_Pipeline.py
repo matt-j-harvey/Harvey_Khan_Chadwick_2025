@@ -12,8 +12,6 @@ import pickle
 import sys
 from tqdm import tqdm
 
-
-
 import Session_List
 import GLM_Utils
 import Create_Behavioural_Regressor_Matrix
@@ -21,18 +19,12 @@ import Extract_Onsets
 import Create_Regression_Matricies
 import Parameter_Search
 import Fit_Full_Model
-import Visualise_Regression_Results
-import Test_Significance_GLM
+import View_Group_Average_Results
 
 
+def run_glm_pipeline(data_directory, session_list, glm_output_directory, start_window, stop_window, regressor_list):
 
-
-
-
-
-
-def run_glm_pipeline(data_directory, session_list, glm_output_directory, start_window, stop_window, context_list = ["visual", "odour"]):
-
+    """
     # Fit Models For Each Session
     for mouse in tqdm(session_list, desc="Mouse"):
         for session in tqdm(mouse, desc="Session"):
@@ -68,9 +60,10 @@ def run_glm_pipeline(data_directory, session_list, glm_output_directory, start_w
 
             # Run Regression
             Fit_Full_Model.fit_full_model(session, glm_output_directory, design_matrix, delta_f_matrix, max_mousecam_components=500)
+    """
 
     # View Group Average Coefs
-    View_Group_Average_Results.view_average_coef_group(selected_session_list, tensor_save_directory)
+    View_Group_Average_Results.view_group_average_results(data_directory, session_list, glm_output_directory, start_window, stop_window, regressor_list)
 
 
 
@@ -87,12 +80,13 @@ start_window_ms = -1500
 stop_window_ms = 2500
 start_window = int(start_window_ms/frame_period)
 stop_window = int(stop_window_ms/frame_period)
+regressor_list = ["Vis_1_Rel", "Vis_2_Rel", "Vis_1_Irrel", "Vis_2_Irrel"]
 
 # Load Session List
 session_list = Session_List.nested_session_list
 
 # Run Pipeline
-run_glm_pipeline(data_root, session_list, output_root, start_window, stop_window)
+run_glm_pipeline(data_root, session_list, output_root, start_window, stop_window, regressor_list)
 
 
 
