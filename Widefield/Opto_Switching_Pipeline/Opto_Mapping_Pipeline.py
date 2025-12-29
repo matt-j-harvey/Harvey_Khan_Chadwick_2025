@@ -23,19 +23,18 @@ import Extract_Onsets
 import Create_Regression_Matricies
 import Parameter_Search
 import Fit_Full_Model
-
-"""
-import View_Group_Average_Results
-"""
+import View_Average_Opto_Results
 
 
 
-def run_glm_pipeline(data_root, experiment, output_root, start_window, stop_window, regressor_list):
 
-    control_session_list = experiment[1]
-    opto_session_list = experiment[2]
+def run_opto_mapping_pipeline(data_root, experiment, output_root, start_window, stop_window, regressor_list):
+
+    control_session_list = experiment[2]
+    opto_session_list = experiment[1]
     session_list = control_session_list + opto_session_list
 
+    """
     # Fit GLM For Each Session
     for session in tqdm(session_list, desc="Mouse"):
         print(session)
@@ -67,10 +66,13 @@ def run_glm_pipeline(data_root, experiment, output_root, start_window, stop_wind
 
         # Run Regression
         Fit_Full_Model.fit_full_model(session, output_root, design_matrix, delta_f_matrix, max_mousecam_components=500)
+    """
 
     # View Group Average Coefs
-    View_Average_Opto_Results.view_group_average_results(data_directory, session_list, glm_output_directory, start_window, stop_window, regressor_list)
+    #View_Average_Opto_Results.view_group_average_results(data_root, control_session_list, output_root, start_window, stop_window, regressor_list, experiment[0] + "_Control")
+    #View_Average_Opto_Results.view_group_average_results(data_root, opto_session_list, output_root, start_window, stop_window, regressor_list, experiment[0] + "_Opsin")
 
+    View_Average_Opto_Results.compare_regressors(output_root, start_window, stop_window, regressor_list, experiment[0])
 
 
 """
@@ -96,7 +98,8 @@ stop_window_ms = 0
 start_window = int(start_window_ms/frame_period)
 stop_window = int(stop_window_ms/frame_period)
 
-regressor_list = ["Attention"
+regressor_list = ["Trial",
+                  "Attention",
                   "Red_Light",
                   "Red_Light_x_Attention"]
 
@@ -139,7 +142,7 @@ experiment_list = [
 
 # Run Pipeline
 for experiment in experiment_list:
-    run_glm_pipeline(data_root, experiment, output_root, start_window, stop_window, regressor_list)
+    run_opto_mapping_pipeline(data_root, experiment, output_root, start_window, stop_window, regressor_list)
 
 
 
