@@ -4,11 +4,18 @@ import matplotlib.pyplot as plt
 from matplotlib.lines import lineStyles
 from scipy import stats
 
-import Get_DF
-import Get_Lick_CD
-import Fa_Lick_CD_Utils
-import Get_Data_Tensor
 
+import Get_DF
+import Get_Data_Tensor
+import Get_Lick_CD
+
+def get_mean_and_sem(data_matrix):
+    data_mean = np.mean(data_matrix, axis=0)
+    data_sem = stats.sem(data_mean, axis=0)
+    lower_bound = np.subtract(data_mean, data_sem)
+    upper_bound = np.add(data_mean, data_sem)
+
+    return data_mean, lower_bound, upper_bound
 
 
 
@@ -49,14 +56,12 @@ def get_fa_onsets(behaviour_matrix):
 
 def plot_false_alarm_lick_cd(data_directory_root, session_list, output_directory_root):
 
+
+    start_window = -16
+    stop_window = 16
+
     cr_projection_list = []
     fa_projection_list = []
-
-    # Tensor Settings
-    start_window = -16
-    stop_window = 9
-    baseline_correct = True
-    baseline_window = 3
 
     for session in session_list:
 
@@ -83,6 +88,10 @@ def plot_false_alarm_lick_cd(data_directory_root, session_list, output_directory
         frame_rate = np.load(os.path.join(session_directory, "Frame_Rate.npy"))
 
         # Get Tensors for CRs and FAs
+        start_window = -16
+        stop_window = 9
+        baseline_correct = True
+        baseline_window = 3
         cr_tensor = Get_Data_Tensor.get_activity_tensors(df_matrix, cr_onsets, start_window, stop_window, baseline_correct, baseline_window)
         fa_tensor = Get_Data_Tensor.get_activity_tensors(df_matrix, fa_onsets, start_window, stop_window, baseline_correct, baseline_window)
 
@@ -114,17 +123,6 @@ def plot_false_alarm_lick_cd(data_directory_root, session_list, output_directory
     fa_upper_bound = np.add(mean_fa_projection, fa_sem)
     fa_lower_bound = np.subtract(mean_fa_projection, fa_sem)
 
-
-    # Test Window
-    window_size = 10
-    print("window", window_size * (1.0 / frame_rate))
-    print("cr_projection_list", np.shape(cr_projection_list))
-    cr_window = np.mean(cr_projection_list[:, np.abs(start_window)-window_size:np.abs(start_window)], axis=1)
-    fa_window = np.mean(fa_projection_list[:, np.abs(start_window)-window_size:np.abs(start_window)], axis=1)
-    print("cr_window", np.shape(cr_window))
-    print("fa_window", np.shape(fa_window))
-    window_t_stat, window_p_value = stats.ttest_rel(cr_window, fa_window, axis=0)
-    print("window_t_stat", window_t_stat, "window_p_value", window_p_value)
 
     # Get Significance
     t_stats, p_values = stats.ttest_rel(cr_projection_list, fa_projection_list, axis=0)
