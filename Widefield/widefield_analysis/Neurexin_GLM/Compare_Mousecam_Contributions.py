@@ -3,11 +3,13 @@ import os
 import pickle
 import matplotlib.pyplot as plt
 
-import GLM_Utils
-import Session_List
-import Create_Regression_Matricies
-import Plotting_Functions
+#import GLM_Utils
+#import Session_List
+#import Create_Regression_Matricies
+#import Plotting_Functions
 
+
+from widefield_analysis.utils import session_list, widefield_utils, plotting_functions
 
 
 
@@ -33,7 +35,7 @@ def get_group_facecam_activity(data_root, session_list, output_root, start_windo
 
     np.save(os.path.join(save_directory, "Group_Mousecam_Activity_Vis_2.npy"), group_list)
 
-
+    """
     group_mean = np.mean(group_list, axis=0)
     plt.ion()
     count = 0
@@ -46,7 +48,7 @@ def get_group_facecam_activity(data_root, session_list, output_root, start_windo
         plt.pause(0.1)
         plt.clf()#
     plt.ioff()
-
+    """
 
 
 
@@ -76,7 +78,7 @@ def get_session_mousecam_contributions(data_root, session, output_root, start_wi
     print("model_coefs", np.shape(model_coefs))
 
     # Load Behaviour Tensor
-    behaviour_tensor = GLM_Utils.open_tensor(os.path.join(output_root, session, "Behaviour_Tensors", "vis_2_correct"))
+    behaviour_tensor = widefield_utils.open_tensor(os.path.join(output_root, session, "Behaviour_Tensors", "vis_2_correct"))
     print("behaviour_tensor", np.shape(behaviour_tensor))
 
     # Get Facecam Coefs
@@ -105,10 +107,22 @@ def get_session_mousecam_contributions(data_root, session, output_root, start_wi
     mean_prediction = np.mean(prediction, axis=0)
     print("mean_prediction", np.shape(mean_prediction))
 
-    mean_prediction = GLM_Utils.reconstruct_regressor_into_pixel_space(data_root, session, mean_prediction)
+    mean_prediction = widefield_utils.reconstruct_regressor_into_pixel_space(data_root, session, mean_prediction)
     return mean_prediction
 
 
+
+
+def baseline_correct_regressors(regressor):
+
+    baseline_corrected_regressor = []
+    for mouse in regressor:
+        mouse_baseline = mouse[0:14]
+        mouse_baseline = np.mean(mouse_baseline, axis=0)
+        mouse = np.subtract(mouse, mouse_baseline)
+        baseline_corrected_regressor.append(mouse)
+    baseline_corrected_regressor = np.array(baseline_corrected_regressor)
+    return baseline_corrected_regressor
 
 
 def view_regressors(control_output_root, neurexin_output_root, start_window, stop_window, results_root):
@@ -121,17 +135,26 @@ def view_regressors(control_output_root, neurexin_output_root, start_window, sto
     control_face_cr = np.load(os.path.join(control_output_root, "Group_Coefs", "Group_Mousecam_Activity_Vis_2.npy"))
     neurexin_face_cr = np.load(os.path.join(neurexin_output_root, "Group_Coefs", "Group_Mousecam_Activity_Vis_2.npy"))
 
+    # Baseline Correct Coefs
+    control_face_cr = baseline_correct_regressors(control_face_cr)
+    neurexin_face_cr = baseline_correct_regressors(neurexin_face_cr)
+
+    print("control_face_cr", np.shape(control_face_cr))
+    print("neurexin_face_cr", np.shape(neurexin_face_cr))
+
     graph_save_directory = os.path.join(results_root, "ROI_Graphs")
     if not os.path.exists(graph_save_directory):
         os.makedirs(graph_save_directory)
 
-    Plotting_Functions.compare_roi_across_groups(control_face_cr, neurexin_face_cr, graph_save_directory, start_window, stop_window, [14,15,16], "Face CRs")
+    #Plotting_Functions.compare_roi_across_groups(control_face_cr, neurexin_face_cr, graph_save_directory, start_window, stop_window, [14,15,16], "Face CRs")
+    plotting_functions.plot_roi_activity(control_face_cr, neurexin_face_cr, graph_save_directory, start_window, stop_window, [14,15,16], "Face CRs")
 
+    """
     # Get Mean Coefs
     control_mean = np.mean(control_face_cr, axis=0)
     neurexin_mean = np.mean(neurexin_face_cr, axis=0)
     mean_diff = np.subtract(neurexin_mean, control_mean)
-
+    """
     """
     print("Getting sig diff")
     t_stats, p_values = stats.ttest_ind(control_lick_coefs, neurexin_lick_coefs, axis=0)
@@ -140,6 +163,7 @@ def view_regressors(control_output_root, neurexin_output_root, start_window, sto
     mean_diff = np.multiply(binary_sig, mean_diff)
     """
 
+    """
     # Linearly Interpolate
     control_mean, new_x_values = GLM_Utils.linearly_interpolate(control_mean, 36, 10, current_x_values, 0)
     neurexin_mean, new_x_values = GLM_Utils.linearly_interpolate(neurexin_mean, 36, 10, current_x_values, 0)
@@ -157,19 +181,10 @@ def view_regressors(control_output_root, neurexin_output_root, start_window, sto
     for directory in save_directory_list:
         if not os.path.exists(directory):
             os.makedirs(directory)
-
+    """
     #Plotting_Functions.visualise_mean_regressor(control_mean,  save_directory_list[0], new_x_values, magnitude=[0, 0.4], cmap=plt.get_cmap('inferno'))
     #Plotting_Functions.visualise_mean_regressor(neurexin_mean, save_directory_list[1], new_x_values, magnitude=[0, 0.4], cmap=plt.get_cmap('inferno'))
     #Plotting_Functions.visualise_mean_regressor(mean_diff,     save_directory_list[2], new_x_values, magnitude=[-0.2, 0.2], cmap=GLM_Utils.get_musall_cmap())
-
-
-def compare_roi_mean_over_learning(output_root,
-                                   pre_session_list,
-                                   pre_start_window,
-                                   pre_stop_window,
-                                   post_session_list,
-                                   post_start_window,
-                                   post_stop_window):
 
 
 
@@ -184,34 +199,33 @@ start_window = int(start_window_ms/frame_period)
 stop_window = int(stop_window_ms/frame_period)
 
 
-#control_session_list = Session_List.control_all_post_learning
-control_session_list = Session_List.control_post_learning_discrimination
+
+control_session_list = session_list.control_post_learning_discrimination
 control_data_root = r"C:\Users\matth\Dropbox\Harvey_Khan_Chadwick_2025\Neurexin_Widefield\Controls"
 control_output_root = r"C:\Neurexin_GLM\Post_Learning\Controls"
 
-#hom_session_list = Session_List.neurexin_all_post_learning
-hom_session_list = Session_List.neurexin_post_learning_discrimination
+hom_session_list = session_list.neurexin_post_learning_discrimination
 hom_data_root = r"C:\Users\matth\Dropbox\Harvey_Khan_Chadwick_2025\Neurexin_Widefield\Homs"
 hom_output_root = r"C:\Neurexin_GLM\Post_Learning\Homs"
 
 results_root = r"C:\Analysis_Output\Neurexin_GLM\Post_Learning_Discrimination_Only\Group_Results"
 
-#get_group_facecam_activity(control_data_root, control_session_list, control_output_root, start_window, stop_window)
-#get_group_facecam_activity(hom_data_root, hom_session_list, hom_output_root, start_window, stop_window)
+get_group_facecam_activity(control_data_root, control_session_list, control_output_root, start_window, stop_window)
+get_group_facecam_activity(hom_data_root, hom_session_list, hom_output_root, start_window, stop_window)
 view_regressors(control_output_root, hom_output_root, start_window, stop_window, results_root)
 
 
 
-control_session_list = Session_List.control_intermediate_learning
+control_session_list = session_list.control_intermediate_learning
 control_data_root = r"C:\Users\matth\Dropbox\Harvey_Khan_Chadwick_2025\Neurexin_Widefield\Controls"
 control_output_root = r"C:\Neurexin_GLM\Intermediate_Learning\Controls"
 
-hom_session_list = Session_List.neurexin_intermediate_learning
+hom_session_list = session_list.neurexin_intermediate_learning
 hom_data_root = r"C:\Users\matth\Dropbox\Harvey_Khan_Chadwick_2025\Neurexin_Widefield\Homs"
 hom_output_root = r"C:\Neurexin_GLM\Intermediate_Learning\Homs"
 
 results_root = r"C:\Analysis_Output\Neurexin_GLM\Intermediate_Learning_Discrimination_Only\Group_Results"
 
-#get_group_facecam_activity(control_data_root, control_session_list, control_output_root, start_window, stop_window)
-#get_group_facecam_activity(hom_data_root, hom_session_list, hom_output_root, start_window, stop_window)
-#view_regressors(control_output_root, hom_output_root, start_window, stop_window, results_root)
+get_group_facecam_activity(control_data_root, control_session_list, control_output_root, start_window, stop_window)
+get_group_facecam_activity(hom_data_root, hom_session_list, hom_output_root, start_window, stop_window)
+view_regressors(control_output_root, hom_output_root, start_window, stop_window, results_root)

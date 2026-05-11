@@ -205,26 +205,6 @@ control_all_post_learning = [
 
 
 
-control_post_learning_discrimination = [
-    [r"NRXN78.1A/2020_11_24_Discrimination_Imaging"],
-    [r"NRXN78.1D/2020_11_25_Discrimination_Imaging"],
-    [r"NXAK4.1B/2021_02_22_Discrimination_Imaging"],
-    [r"NXAK7.1B/2021_02_24_Discrimination_Imaging"],
-    [r"NXAK14.1A/2021_05_09_Discrimination_Imaging"],
-    [r"NXAK22.1A/2021_10_08_Discrimination_Imaging"]
-]
-
-
-neurexin_post_learning_discrimination = [
-    [r"NRXN71.2A/2020_12_09_Discrimination_Imaging"],
-    [r"NXAK4.1A/2021_03_05_Discrimination_Imaging"],
-    [r"NXAK10.1A/2021_05_14_Discrimination_Imaging"],
-    [r"NXAK16.1B/2021_06_15_Discrimination_Imaging"],
-    [r"NXAK20.1B/2021_10_19_Discrimination_Imaging"],
-    [r"NXAK24.1C/2021_10_06_Discrimination_Imaging"],
-]
-
-
 
 
 neurexin_all_post_learning = [
@@ -359,6 +339,16 @@ neurexin_intermediate_learning = [
 
 ]
 
+neurexin_post_learning_discrimination = [
+    [r"NRXN71.2A/2020_12_09_Discrimination_Imaging"],
+    [r"NXAK4.1A/2021_03_05_Discrimination_Imaging"],
+    [r"NXAK10.1A/2021_05_14_Discrimination_Imaging"],
+    [r"NXAK16.1B/2021_06_15_Discrimination_Imaging"],
+    [r"NXAK20.1B/2021_10_19_Discrimination_Imaging"],
+    [r"NXAK24.1C/2021_10_06_Discrimination_Imaging"],
+]
+
+
 
 
 control_pre_learning = [
@@ -407,6 +397,18 @@ control_intermediate_learning = [
      "NXAK22.1A/2021_10_05_Discrimination_Imaging"],
 
 ]
+
+
+control_post_learning_discrimination = [
+    [r"NRXN78.1D/2020_11_25_Discrimination_Imaging"],
+    [r"NRXN78.1A/2020_11_24_Discrimination_Imaging"],
+    [r"NXAK4.1B/2021_02_22_Discrimination_Imaging"],
+    [r"NXAK7.1B/2021_02_24_Discrimination_Imaging"],
+    [r"NXAK14.1A/2021_05_09_Discrimination_Imaging"],
+    [r"NXAK22.1A/2021_10_08_Discrimination_Imaging"]
+]
+
+
 
 
 # Days 1,2,3

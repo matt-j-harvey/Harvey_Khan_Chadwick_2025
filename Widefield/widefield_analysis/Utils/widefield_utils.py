@@ -445,3 +445,26 @@ def linearly_interpolate(data, current_spacing, new_spacing, current_x_values, o
     interpolated_x_values = interpolated_x_values[offset::new_spacing]
 
     return interpolated_data, interpolated_x_values
+
+
+
+def get_roi_mean(regressor, atlas, roi_list):
+
+    # Load Atlas
+    indicies, image_height, image_width = load_tight_mask()
+
+    # Get Brain Pixels
+    n_mice, n_timepoints, image_height, image_width = np.shape(regressor)
+    regressor = np.reshape(regressor, (n_mice, n_timepoints, image_height * image_width))
+    regressor = regressor[:, :, indicies]
+    regressor = np.squeeze(regressor)
+
+    print("regressor", np.shape(regressor))
+    # Get ROI Pixels
+    roi_pixels = get_roi_pixels(atlas, roi_list)
+
+    regressor = regressor[:, :, roi_pixels]
+    regressor = np.nan_to_num(regressor)
+    regressor = np.mean(regressor, axis=2)
+    return regressor
+
